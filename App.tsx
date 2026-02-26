@@ -75,7 +75,7 @@ const App: React.FC = () => {
         };
 
         if (existingResult) {
-          setFinalResults(existingResult);
+          setFinalResults(existingResult as ScoringResult);
           setState(prev => ({ ...prev, loginInfo: info, currentPhase: Phase.Results }));
         } else {
           setState(prev => ({ ...prev, loginInfo: info, currentPhase: Phase.Intro }));
@@ -228,7 +228,7 @@ const App: React.FC = () => {
         setFinalResults(results);
       } else {
         const existing = await fetchResultByPNo(state.loginInfo!.pNo);
-        if (existing) setFinalResults(existing);
+        if (existing) setFinalResults(existing as ScoringResult);
       }
       
       setState(prev => ({ ...prev, currentPhase: Phase.Results }));

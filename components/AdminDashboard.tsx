@@ -8,7 +8,7 @@ import {
   Target, Zap, Shield, MessageSquare, BarChart, Lock, Key, CheckCircle2, AlertCircle,
   UserMinus, UserPlus, Hash, Building2, Briefcase, MapPin, Factory, EyeOff, SlidersHorizontal,
   Calendar, RotateCcw, Crown, Medal, Star, Award, ChevronDown, ChevronUp,
-  TrendingDown, ShieldAlert, Fingerprint, Copy, Check
+  TrendingDown, ShieldAlert, Fingerprint, Copy, Check, Terminal
 } from 'lucide-react';
 import { 
   fetchAssessmentResults, 
@@ -16,7 +16,6 @@ import {
   deleteAssessmentResult, 
   deleteUser,
   updateUserPassword,
-  updateUserRecoveryCode,
   testDatabaseConnection,
   wipeAllData
 } from '../db';
@@ -28,19 +27,20 @@ import {
   LineChart, Line, CartesianGrid, Legend
 } from 'recharts';
 import ITCLogo from './ITCLogo';
+import AdminChatbot from './AdminChatbot';
 
 interface Props {
   onBack: () => void;
   currentUser: any;
 }
 
-const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
+export default function AdminDashboard({ onBack, currentUser }: Props) {
   const [assessmentData, setAssessmentData] = useState<any[]>([]);
   const [userData, setUserData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiInsight, setAiInsight] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'Overview' | 'Results' | 'Gamification' | 'Directory' | 'AI Insights' | 'Security'>('Overview');
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Results' | 'Gamification' | 'Directory' | 'AI Insights' | 'Security' | 'Command Center'>('Overview');
   const [dbStatus, setDbStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   
   // Filtering & Search
@@ -56,7 +56,6 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
   const [scoreMax, setScoreMax] = useState<string>('5');
   const [dateStart, setDateStart] = useState<string>('');
   const [dateEnd, setDateEnd] = useState<string>('');
-  const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
 
   // Sorting
   const [sortKey, setSortKey] = useState<string>('created_at');
@@ -65,16 +64,11 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [userDeleteConfirmId, setUserDeleteConfirmId] = useState<number | null>(null);
-  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
-  const [bulkUserDeleteConfirm, setBulkUserDeleteConfirm] = useState(false);
   const [wipeAllConfirm, setWipeAllConfirm] = useState(false);
 
   // Security States
   const [passForm, setPassForm] = useState({ current: '', new: '', confirm: '' });
-  const [recoveryForm, setRecoveryForm] = useState({ current: '', newCode: '' });
   const [passStatus, setPassStatus] = useState<any>(null);
-  const [recoveryStatus, setRecoveryStatus] = useState<any>(null);
-  const [copied, setCopied] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -86,14 +80,16 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
       setAssessmentData(results || []);
       setUserData(users || []);
     } catch (err) {
-      console.error(err);
+      console.error("Dashboard Load Error:", err);
       setDbStatus('offline');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { 
+    loadData(); 
+  }, []);
 
   const handleDelete = async (id: number) => {
     const success = await deleteAssessmentResult(id);
@@ -112,27 +108,6 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
     }
   };
 
-  const handleBulkDelete = async () => {
-    setLoading(true);
-    for (const item of filteredAssessments) {
-      if (item.id) await deleteAssessmentResult(item.id);
-    }
-    await loadData();
-    setBulkDeleteConfirm(false);
-    setLoading(false);
-  };
-
-  const handleBulkUserDelete = async () => {
-    setLoading(true);
-    const usersToClear = filteredUsers.filter(u => u.employee_id_pno !== 'ADMIN-001');
-    for (const user of usersToClear) {
-      await deleteUser(user.id);
-    }
-    await loadData();
-    setBulkUserDeleteConfirm(false);
-    setLoading(false);
-  };
-
   const handleWipeAll = async () => {
     setLoading(true);
     const result = await wipeAllData();
@@ -141,7 +116,7 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
       setWipeAllConfirm(false);
       setActiveTab('Overview');
     } else {
-      alert("Nuclear Wipe Failed: " + result.error);
+      alert("System Wipe Failed: " + result.error);
     }
     setLoading(false);
   };
@@ -149,9 +124,10 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
   const stats = useMemo(() => {
     const total = assessmentData.length;
     if (total === 0) return { total: 0, avgEngagement: 0, avgPoints: 0, badgesAwarded: 0, behavioralAverages: [], deptAnalysis: [], badgeAnalysis: [], trendData: [], categoryAnalysis: [] };
-    const avgEngagement = assessmentData.reduce((acc, curr) => acc + curr.engagementScore, 0) / total;
+    
+    const avgEngagement = assessmentData.reduce((acc, curr) => acc + (curr.engagementScore || 0), 0) / total;
     const avgPoints = assessmentData.reduce((acc, curr) => acc + (curr.totalPoints || 0), 0) / total;
-    const badgesAwarded = assessmentData.reduce((acc, curr) => acc + (curr.badges?.length || 0), 0);
+    const badgesAwarded = assessmentData.reduce((acc, curr) => acc + (curr.badges?.length || 0), 0) / total;
     
     const bSums: Record<string, number> = {};
     assessmentData.forEach(item => {
@@ -179,20 +155,17 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
         badgeCounts[b] = (badgeCounts[b] || 0) + 1;
       });
     });
-    const badgeAnalysis = Object.entries(badgeCounts).map(([name, count]) => ({
-      name,
-      value: count
-    }));
+    const badgeAnalysis = Object.entries(badgeCounts).map(([name, value]) => ({ name, value }));
 
     const catCounts: Record<string, number> = {};
     assessmentData.forEach(item => {
-      catCounts[item.category] = (catCounts[item.category] || 0) + 1;
+      if (item.category) catCounts[item.category] = (catCounts[item.category] || 0) + 1;
     });
     const categoryAnalysis = Object.entries(catCounts).map(([name, value]) => ({ name, value }));
 
     const dailyPoints: Record<string, number> = {};
     assessmentData.forEach(item => {
-      const date = new Date(item.created_at).toLocaleDateString();
+      const date = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Unknown';
       dailyPoints[date] = (dailyPoints[date] || 0) + (item.totalPoints || 0);
     });
     const trendData = Object.entries(dailyPoints).map(([date, points]) => ({ date, points })).slice(-7);
@@ -201,57 +174,67 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
   }, [assessmentData]);
 
   const filteredAssessments = useMemo(() => {
-    let result = assessmentData.filter(item => {
-      const matchesSearch = item.loginInfo?.employeeName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           item.loginInfo?.pNo?.toLowerCase().includes(searchTerm.toLowerCase());
+    let result = [...assessmentData].filter(item => {
+      const name = (item.loginInfo?.employeeName || '').toLowerCase();
+      const pno = (item.loginInfo?.pNo || '').toLowerCase();
+      const sTerm = searchTerm.toLowerCase();
+      const matchesSearch = name.includes(sTerm) || pno.includes(sTerm);
+      
       const matchesDept = filterDept === 'All' || item.loginInfo?.department === filterDept;
       const matchesLoc = filterLoc === 'All' || item.loginInfo?.location === filterLoc;
       const matchesCat = filterCat === 'All' || item.category === filterCat;
-      const score = item.engagementScore;
-      const matchesScore = score >= parseFloat(scoreMin || '0') && score <= parseFloat(scoreMax || '5');
       
-      const createdAt = new Date(item.created_at).getTime();
+      const score = item.engagementScore || 0;
+      const minS = parseFloat(scoreMin) || 0;
+      const maxS = parseFloat(scoreMax) || 5;
+      const matchesScore = score >= minS && score <= maxS;
+      
+      const createdAt = item.created_at ? new Date(item.created_at).getTime() : 0;
       const start = dateStart ? new Date(dateStart).setHours(0,0,0,0) : 0;
       const end = dateEnd ? new Date(dateEnd).setHours(23,59,59,999) : Infinity; 
       const matchesDate = createdAt >= start && createdAt <= end;
       
-      const matchesTrait = selectedTraits.length === 0 || 
-                          selectedTraits.some(trait => (item.behavioralProfile?.[trait] || 0) > 0);
-
-      return matchesSearch && matchesDept && matchesLoc && matchesCat && matchesScore && matchesDate && matchesTrait;
+      return matchesSearch && matchesDept && matchesLoc && matchesCat && matchesScore && matchesDate;
     });
 
     result.sort((a, b) => {
       let valA: any, valB: any;
-      if (sortKey === 'loginInfo.employeeName') {
-        valA = a.loginInfo?.employeeName?.toLowerCase() || '';
-        valB = b.loginInfo?.employeeName?.toLowerCase() || '';
-      } else if (sortKey === 'loginInfo.pNo') {
-        valA = Number(a.loginInfo?.pNo) || 0;
-        valB = Number(b.loginInfo?.pNo) || 0;
-      } else {
-        valA = a[sortKey] ?? 0;
-        valB = b[sortKey] ?? 0;
-      }
+      
+      const getNested = (obj: any, path: string) => {
+        return path.split('.').reduce((o, i) => (o ? o[i] : undefined), obj);
+      };
+
+      valA = getNested(a, sortKey);
+      valB = getNested(b, sortKey);
+
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+      
+      if (valA === undefined || valA === null) valA = 0;
+      if (valB === undefined || valB === null) valB = 0;
+
       if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
       if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
 
     return result;
-  }, [assessmentData, searchTerm, filterDept, filterLoc, filterCat, scoreMin, scoreMax, dateStart, dateEnd, selectedTraits, sortKey, sortOrder]);
+  }, [assessmentData, searchTerm, filterDept, filterLoc, filterCat, scoreMin, scoreMax, dateStart, dateEnd, sortKey, sortOrder]);
 
   const filteredUsers = useMemo(() => {
     return userData.filter(u => 
-      u.full_name?.toLowerCase().includes(userSearchTerm.toLowerCase()) || 
-      u.employee_id_pno?.toLowerCase().includes(userSearchTerm.toLowerCase())
+      (u.full_name || '').toLowerCase().includes(userSearchTerm.toLowerCase()) || 
+      (u.employee_id_pno || '').toLowerCase().includes(userSearchTerm.toLowerCase())
     );
   }, [userData, userSearchTerm]);
 
   const generateAIAnalysis = async () => {
     if (assessmentData.length === 0) return;
     setAnalyzing(true);
+    setAiInsight(null);
     try {
+      if (!process.env.API_KEY) throw new Error("API Key Missing");
+      
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const prompt = `Act as a senior HR analyst for ITC. Analyze this workforce survey dataset:
       - Participants: ${assessmentData.length}
@@ -262,17 +245,16 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
       Provide a strategic summary with 3 sections:
       1. Morale Pulse (Sentiment analysis)
       2. Performance DNA (Key behavioral trends)
-      3. Strategic Advice (How to improve excellence).
-      Keep the tone professional and forward-thinking. Use bullet points.`;
+      3. Strategic Advice (How to improve excellence).`;
       
       const response = await ai.models.generateContent({ 
-        model: 'gemini-3-pro-preview', 
+        model: 'gemini-3-flash-preview', 
         contents: prompt
       });
       setAiInsight(response.text || "Analysis complete.");
-    } catch (err) {
+    } catch (err: any) {
       console.error("AI Insight Generation Failed:", err);
-      setAiInsight("AI Analysis failed to compute. Please ensure the system has an active connection and try again.");
+      setAiInsight("AI Analysis failed to compute. Ensure your API key is correctly configured in your deployment environment.");
     } finally { setAnalyzing(false); }
   };
 
@@ -295,7 +277,6 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
 
   const exportCSV = () => {
     if (filteredAssessments.length === 0) return;
-    
     const headers = ['Employee Name', 'P.NO', 'Department', 'Designation', 'Location', 'Engagement Score', 'Engagement Level', 'Total Points', 'Category', 'Feedback', 'Date'];
     const rows = filteredAssessments.map(row => [
       `"${row.loginInfo?.employeeName || ''}"`,
@@ -303,21 +284,18 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
       `"${row.loginInfo?.department || ''}"`,
       `"${row.loginInfo?.designation || ''}"`,
       `"${row.loginInfo?.location || ''}"`,
-      row.engagementScore.toFixed(2),
-      row.engagementLevel,
-      row.totalPoints,
-      row.category,
+      (row.engagementScore || 0).toFixed(2),
+      row.engagementLevel || 'N/A',
+      row.totalPoints || 0,
+      row.category || 'N/A',
       `"${(row.feedback || '').replace(/"/g, '""')}"`,
-      new Date(row.created_at).toLocaleDateString()
+      row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A'
     ]);
-
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ITC_Assessments_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `ITC_Admin_Report_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -339,12 +317,12 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700">
             <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Core Engagement</p>
-            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{record.engagementScore.toFixed(2)}</div>
+            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{(record.engagementScore || 0).toFixed(2)}</div>
             <p className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full inline-block ${record.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : record.engagementLevel === 'Low' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>{record.engagementLevel}</p>
           </div>
           <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700">
             <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Excellence Points</p>
-            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{record.totalPoints}</div>
+            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{record.totalPoints || 0}</div>
             <p className="text-[10px] font-black uppercase text-slate-400">Total Accumulation</p>
           </div>
           <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700">
@@ -392,10 +370,10 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
 
       {/* Navigation Tabs */}
       <div className="flex overflow-x-auto pb-4 gap-2 no-scrollbar">
-        {(['Overview', 'Results', 'Gamification', 'Directory', 'AI Insights', 'Security'] as const).map(tab => (
+        {['Overview', 'Results', 'Gamification', 'Directory', 'Command Center', 'AI Insights', 'Security'].map(tab => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => setActiveTab(tab as any)}
             className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all border ${
               activeTab === tab 
               ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xl scale-105' 
@@ -423,7 +401,7 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
               ].map((s, i) => (
                 <div key={i} className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-6">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${s.bg} ${s.color}`}>
-                    {React.cloneElement(s.icon as React.ReactElement, { className: 'w-7 h-7' })}
+                    {React.cloneElement(s.icon as React.ReactElement<any>, { className: 'w-7 h-7' })}
                   </div>
                   <div>
                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{s.label}</p>
@@ -436,24 +414,28 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Sentiment Trend (7 Days)</h3>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={stats.trendData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="date" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
-                    <YAxis tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
-                    <RechartsTooltip />
-                    <Line type="monotone" dataKey="points" stroke="#6366f1" strokeWidth={4} dot={{ r: 6, fill: '#6366f1' }} />
-                  </LineChart>
-                </ResponsiveContainer>
+                {stats.trendData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={stats.trendData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
+                      <YAxis tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
+                      <RechartsTooltip />
+                      <Line type="monotone" dataKey="points" stroke="#6366f1" strokeWidth={4} dot={{ r: 6, fill: '#6366f1' }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : <div className="flex-1 flex items-center justify-center text-slate-400 italic">Insufficient trend data</div>}
               </div>
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Department Benchmarks</h3>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart data={stats.deptAnalysis}>
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
-                    <Bar dataKey="avg" fill="#6366f1" radius={[10, 10, 0, 0]} />
-                  </RechartsBarChart>
-                </ResponsiveContainer>
+                {stats.deptAnalysis.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={stats.deptAnalysis}>
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
+                      <Bar dataKey="avg" fill="#6366f1" radius={[10, 10, 0, 0]} />
+                    </RechartsBarChart>
+                  </ResponsiveContainer>
+                ) : <div className="flex-1 flex items-center justify-center text-slate-400 italic">No department data available</div>}
               </div>
            </div>
         </div>
@@ -477,13 +459,9 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
                 <button onClick={exportCSV} className="px-6 py-4 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-500 transition-all">
                   <Download className="w-4 h-4" /> Export CSV
                 </button>
-                <button onClick={() => setBulkDeleteConfirm(true)} className="px-6 py-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 text-rose-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all">
-                  <Trash2 className="w-4 h-4" /> Clear Filtered
-                </button>
               </div>
-
               {showAdvancedFilters && (
-                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2">
+                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-top-2">
                    <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2"><Calendar className="w-3 h-3" /> Start Date</label>
                       <input type="date" className="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold" value={dateStart} onChange={e => setDateStart(e.target.value)} />
@@ -492,20 +470,16 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2"><Calendar className="w-3 h-3" /> End Date</label>
                       <input type="date" className="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold" value={dateEnd} onChange={e => setDateEnd(e.target.value)} />
                    </div>
-                   <div className="flex items-end">
-                      <button onClick={() => { setDateStart(''); setDateEnd(''); setScoreMin('0'); setScoreMax('5'); }} className="text-[9px] font-black uppercase tracking-widest text-indigo-600 hover:underline">Reset Date Filters</button>
-                   </div>
                 </div>
               )}
            </div>
-
-           {/* Results Table */}
+           
            <div className="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
-                      {(['loginInfo.employeeName', 'loginInfo.pNo', 'engagementScore', 'totalPoints', 'created_at'] as const).map(k => (
+                      {['loginInfo.employeeName', 'loginInfo.pNo', 'engagementScore', 'totalPoints', 'created_at'].map(k => (
                         <th key={k} onClick={() => handleSort(k)} className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest cursor-pointer hover:text-slate-900 dark:hover:text-white">
                           <div className="flex items-center gap-2">
                             {k.split('.').pop()?.replace('_', ' ')}
@@ -519,31 +493,31 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
                   <tbody>
                     {filteredAssessments.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-8 py-12 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">No matching results found</td>
+                        <td colSpan={6} className="px-8 py-16 text-center text-slate-400 font-bold uppercase tracking-widest italic text-xs">No records found matching your filters</td>
                       </tr>
                     ) : (
                       filteredAssessments.map(row => (
                         <tr key={row.id} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all group">
                           <td className="px-8 py-6">
-                            <p className="font-black text-slate-900 dark:text-white">{row.loginInfo?.employeeName}</p>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase">{row.loginInfo?.department}</p>
+                             <p className="font-black text-slate-900 dark:text-white">{row.loginInfo?.employeeName || 'N/A'}</p>
+                             <p className="text-[9px] font-bold text-slate-400 uppercase">{row.loginInfo?.department || 'N/A'}</p>
                           </td>
-                          <td className="px-8 py-6 font-mono font-bold text-slate-500">{row.loginInfo?.pNo}</td>
+                          <td className="px-8 py-6 font-mono font-bold text-slate-500">{row.loginInfo?.pNo || 'N/A'}</td>
                           <td className="px-8 py-6">
-                            <div className="flex items-center gap-3">
-                              <span className="font-black text-slate-900 dark:text-white">{row.engagementScore.toFixed(2)}</span>
-                              <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${row.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{row.engagementLevel}</span>
-                            </div>
+                             <div className="flex items-center gap-3">
+                               <span className="font-black text-slate-900 dark:text-white">{(row.engagementScore || 0).toFixed(2)}</span>
+                               <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${row.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{row.engagementLevel || 'N/A'}</span>
+                             </div>
                           </td>
                           <td className="px-8 py-6">
-                            <span className="font-black text-indigo-600 dark:text-indigo-400">{row.totalPoints}</span>
+                             <span className="font-black text-indigo-600 dark:text-indigo-400">{row.totalPoints || 0}</span>
                           </td>
-                          <td className="px-8 py-6 text-[10px] font-bold text-slate-400">{new Date(row.created_at).toLocaleDateString()}</td>
+                          <td className="px-8 py-6 text-[10px] font-bold text-slate-400">{row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A'}</td>
                           <td className="px-8 py-6">
-                            <div className="flex items-center gap-2">
+                             <div className="flex items-center gap-2">
                                 <button onClick={() => setSelectedRecord(row)} className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 hover:bg-blue-600 hover:text-white transition-all"><Eye className="w-4 h-4" /></button>
                                 <button onClick={() => setDeleteConfirmId(row.id)} className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/20 text-rose-600 hover:bg-rose-600 hover:text-white transition-all"><Trash2 className="w-4 h-4" /></button>
-                            </div>
+                             </div>
                           </td>
                         </tr>
                       ))
@@ -551,6 +525,71 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
                   </tbody>
                 </table>
               </div>
+           </div>
+        </div>
+      ) : activeTab === 'Gamification' ? (
+        <div className="space-y-8 animate-in slide-in-from-bottom-4">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
+                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Badge Distribution</h3>
+                 {stats.badgeAnalysis.length > 0 ? (
+                   <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPieChart>
+                         <Pie 
+                           data={stats.badgeAnalysis} 
+                           innerRadius={80} 
+                           outerRadius={120} 
+                           paddingAngle={5} 
+                           dataKey="value"
+                         >
+                           {stats.badgeAnalysis.map((_, index) => (
+                             <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'][index % 5]} />
+                           ))}
+                         </Pie>
+                         <RechartsTooltip />
+                         <Legend />
+                      </RechartsPieChart>
+                   </ResponsiveContainer>
+                 ) : <div className="flex-1 flex items-center justify-center text-slate-400 italic">No badges issued yet</div>}
+              </div>
+              <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
+                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Performance Tiers</h3>
+                 {stats.categoryAnalysis.length > 0 ? (
+                   <ResponsiveContainer width="100%" height="100%">
+                      <RechartsBarChart layout="vertical" data={stats.categoryAnalysis}>
+                         <XAxis type="number" hide />
+                         <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} width={120} />
+                         <RechartsTooltip />
+                         <Bar dataKey="value" fill="#10b981" radius={[0, 10, 10, 0]} />
+                      </RechartsBarChart>
+                   </ResponsiveContainer>
+                 ) : <div className="flex-1 flex items-center justify-center text-slate-400 italic">No tiered data yet</div>}
+              </div>
+           </div>
+           <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center gap-4 mb-8">
+                 <Crown className="w-8 h-8 text-amber-500" />
+                 <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Top Performers Leaderboard</h3>
+              </div>
+              {assessmentData.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   {assessmentData.slice(0, 3).map((item, idx) => (
+                     <div key={idx} className={`p-8 rounded-[2.5rem] border-2 relative overflow-hidden flex flex-col items-center text-center gap-4 transition-all hover:scale-105 ${idx === 0 ? 'bg-amber-50 border-amber-200' : idx === 1 ? 'bg-slate-50 border-slate-200' : 'bg-orange-50 border-orange-200'}`}>
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center font-black text-2xl ${idx === 0 ? 'bg-amber-500 text-white' : idx === 1 ? 'bg-slate-400 text-white' : idx === 2 ? 'bg-orange-400 text-white' : ''}`}>
+                          {idx + 1}
+                        </div>
+                        <div>
+                           <p className="text-xl font-black text-slate-900">{item.loginInfo?.employeeName || 'N/A'}</p>
+                           <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{item.loginInfo?.department || 'N/A'}</p>
+                        </div>
+                        <div className="space-y-1">
+                           <p className="text-4xl font-black text-slate-900">{item.totalPoints || 0}</p>
+                           <p className="text-[9px] font-bold text-slate-400 uppercase">Total Excellence Pts</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+              ) : <div className="py-12 text-center text-slate-400 italic">No leaderboard data available</div>}
            </div>
         </div>
       ) : activeTab === 'Directory' ? (
@@ -586,41 +625,46 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.map(user => (
+                    {filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-8 py-16 text-center text-slate-400 italic">No users matching search criteria</td>
+                      </tr>
+                    ) : filteredUsers.map(user => (
                       <tr key={user.id} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all">
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-4">
                               <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-500">
-                                {user.full_name?.charAt(0)}
+                                {user.full_name?.charAt(0) || '?'}
                               </div>
-                              <p className="font-black text-slate-900 dark:text-white">{user.full_name}</p>
+                              <p className="font-black text-slate-900 dark:text-white">{user.full_name || 'N/A'}</p>
                            </div>
                         </td>
-                        <td className="px-8 py-6 font-mono font-bold text-slate-500">{user.employee_id_pno}</td>
+                        <td className="px-8 py-6 font-mono font-bold text-slate-500">{user.employee_id_pno || 'N/A'}</td>
                         <td className="px-8 py-6">
-                           <p className="text-xs font-black text-slate-700 dark:text-slate-300">{user.department}</p>
-                           <p className="text-[9px] font-bold text-slate-400 uppercase">{user.designation}</p>
+                           <p className="text-xs font-black text-slate-700 dark:text-slate-300">{user.department || 'N/A'}</p>
+                           <p className="text-[9px] font-bold text-slate-400 uppercase">{user.designation || 'N/A'}</p>
                         </td>
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-2 text-slate-500">
                               <MapPin className="w-3 h-3" />
-                              <span className="text-xs font-bold">{user.location}</span>
+                              <span className="text-xs font-bold">{user.location || 'Unknown'}</span>
                            </div>
                         </td>
                         <td className="px-8 py-6">
                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'}`}>
-                             {user.role}
+                             {user.role || 'user'}
                            </span>
                         </td>
                         <td className="px-8 py-6 text-center">
                            <button 
                              onClick={async () => {
-                               const results = await fetchAssessmentResults();
-                               const record = results.find(r => r.loginInfo.pNo === user.employee_id_pno);
+                               const record = assessmentData.find(r => r.loginInfo?.pNo === user.employee_id_pno);
                                if (record) {
-                                 await deleteAssessmentResult(record.id);
-                                 loadData();
-                                 alert(`Assessment data cleared for ${user.full_name}`);
+                                 const res = await deleteAssessmentResult(record.id);
+                                 if (res) {
+                                   loadData();
+                                   alert(`Assessment data cleared for ${user.full_name}`);
+                                 }
                                } else {
                                  alert('No assessment data found for this user.');
                                }
@@ -646,66 +690,6 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
               </div>
            </div>
         </div>
-      ) : activeTab === 'Gamification' ? (
-        <div className="space-y-8 animate-in slide-in-from-bottom-4">
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
-                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Badge Distribution</h3>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                       <Pie 
-                         data={stats.badgeAnalysis} 
-                         innerRadius={80} 
-                         outerRadius={120} 
-                         paddingAngle={5} 
-                         dataKey="value"
-                       >
-                         {stats.badgeAnalysis.map((_, index) => (
-                           <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'][index % 5]} />
-                         ))}
-                       </Pie>
-                       <RechartsTooltip />
-                       <Legend />
-                    </RechartsPieChart>
-                 </ResponsiveContainer>
-              </div>
-              <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
-                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Performance Tiers</h3>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <RechartsBarChart layout="vertical" data={stats.categoryAnalysis}>
-                       <XAxis type="number" hide />
-                       <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} width={120} />
-                       <RechartsTooltip />
-                       <Bar dataKey="value" fill="#10b981" radius={[0, 10, 10, 0]} />
-                    </RechartsBarChart>
-                 </ResponsiveContainer>
-              </div>
-           </div>
-
-           <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-              <div className="flex items-center gap-4 mb-8">
-                 <Crown className="w-8 h-8 text-amber-500" />
-                 <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Top Performers Leaderboard</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 {assessmentData.slice(0, 3).map((item, idx) => (
-                   <div key={idx} className={`p-8 rounded-[2.5rem] border-2 relative overflow-hidden flex flex-col items-center text-center gap-4 transition-all hover:scale-105 ${idx === 0 ? 'bg-amber-50 border-amber-200' : idx === 1 ? 'bg-slate-50 border-slate-200' : 'bg-orange-50 border-orange-200'}`}>
-                      <div className={`w-14 h-14 rounded-full flex items-center justify-center font-black text-2xl ${idx === 0 ? 'bg-amber-500 text-white' : idx === 1 ? 'bg-slate-400 text-white' : idx === 2 ? 'bg-orange-400 text-white' : ''}`}>
-                        {idx + 1}
-                      </div>
-                      <div>
-                         <p className="text-xl font-black text-slate-900">{item.loginInfo?.employeeName}</p>
-                         <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{item.loginInfo?.department}</p>
-                      </div>
-                      <div className="space-y-1">
-                         <p className="text-4xl font-black text-slate-900">{item.totalPoints}</p>
-                         <p className="text-[9px] font-bold text-slate-400 uppercase">Total Excellence Pts</p>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-           </div>
-        </div>
       ) : activeTab === 'AI Insights' ? (
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
            <div className="bg-indigo-600 p-12 rounded-[4rem] text-white relative overflow-hidden shadow-2xl">
@@ -715,20 +699,19 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
                    <div className="bg-white/20 p-4 rounded-3xl"><Sparkles className="w-10 h-10" /></div>
                    <h3 className="text-4xl font-black tracking-tight">Strategy Generator</h3>
                  </div>
-                 <p className="text-indigo-100 text-xl font-medium">Use the Gemini Reasoning Engine to synthesize multi-dimensional employee data into actionable leadership insights.</p>
+                 <p className="text-indigo-100 text-xl font-medium">Use the Gemini reasoning engine to synthesize large-scale employee feedback into actionable leadership strategies.</p>
                  <button 
                    onClick={generateAIAnalysis} 
-                   disabled={analyzing}
+                   disabled={analyzing || assessmentData.length === 0}
                    className={`px-10 py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${
-                     analyzing ? 'bg-white/20 text-white/50' : 'bg-white text-indigo-900 hover:bg-indigo-50 shadow-xl'
+                     (analyzing || assessmentData.length === 0) ? 'bg-white/20 text-white/50 cursor-not-allowed' : 'bg-white text-indigo-900 hover:bg-indigo-50 shadow-xl'
                    }`}
                  >
                    {analyzing ? <Loader2 className="w-6 h-6 animate-spin" /> : <BrainCircuit className="w-6 h-6" />}
-                   Generate Tactical Analysis
+                   {assessmentData.length === 0 ? 'Insufficient Data' : 'Generate Strategic Analysis'}
                  </button>
               </div>
            </div>
-
            {aiInsight && (
              <div className="bg-white dark:bg-slate-900 p-12 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-xl animate-in fade-in zoom-in-95 duration-500">
                 <div className="prose prose-slate dark:prose-invert max-w-none">
@@ -747,16 +730,16 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
               <form onSubmit={handlePasswordChange} className="space-y-6">
                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Current Key</label>
-                    <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.current} onChange={e => setFormState(setPassForm, 'current', e.target.value)} />
+                    <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.current} onChange={e => setPassForm(p => ({...p, current: e.target.value}))} />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">New Key</label>
-                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.new} onChange={e => setFormState(setPassForm, 'new', e.target.value)} />
+                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.new} onChange={e => setPassForm(p => ({...p, new: e.target.value}))} />
                     </div>
                     <div className="space-y-2">
                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Confirm</label>
-                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.confirm} onChange={e => setFormState(setPassForm, 'confirm', e.target.value)} />
+                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.confirm} onChange={e => setPassForm(p => ({...p, confirm: e.target.value}))} />
                     </div>
                  </div>
                  {passStatus && <p className={`text-[11px] font-black uppercase ${passStatus.type === 'error' ? 'text-rose-600' : 'text-emerald-600'}`}>{passStatus.msg}</p>}
@@ -777,9 +760,11 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
               </div>
            </div>
         </div>
+      ) : activeTab === 'Command Center' ? (
+        <AdminChatbot assessmentData={assessmentData} userData={userData} />
       ) : null}
 
-      {/* Modals */}
+      {/* Wipe/Delete Modals */}
       {selectedRecord && <RecordDetailsModal record={selectedRecord} onClose={() => setSelectedRecord(null)} />}
       
       {deleteConfirmId && (
@@ -801,7 +786,7 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
            <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] shadow-2xl max-w-sm w-full text-center space-y-6">
               <div className="bg-rose-50 dark:bg-rose-950/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-rose-600"><UserMinus className="w-10 h-10" /></div>
               <h4 className="text-2xl font-black text-slate-900 dark:text-white">Delete User?</h4>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Deleting this user will also erase all their assessment records from the history.</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Deleting this user will also erase all their associated assessment records.</p>
               <div className="flex gap-4">
                  <button onClick={() => setUserDeleteConfirmId(null)} className="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-[10px]">Cancel</button>
                  <button onClick={() => handleUserDelete(userDeleteConfirmId)} className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-black uppercase text-[10px]">Delete User</button>
@@ -828,10 +813,4 @@ const AdminDashboard: React.FC<Props> = ({ onBack, currentUser }) => {
       )}
     </div>
   );
-};
-
-function setFormState(setter: any, key: string, val: string) {
-  setter((prev: any) => ({ ...prev, [key]: val }));
 }
-
-export default AdminDashboard;

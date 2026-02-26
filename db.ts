@@ -1,6 +1,5 @@
 
 import { neon } from '@neondatabase/serverless';
-// Fixed: Added missing import for ScoringResult type
 import { ScoringResult } from './types';
 
 // Updated connection string
@@ -140,30 +139,57 @@ export async function loginUser(pNo: string, securityKey: string) {
   }
 }
 
-// Fixed: Added correct type for 'result' parameter
 export async function saveAssessmentResult(result: ScoringResult) {
   await initDatabase();
   try {
     await sql`
       INSERT INTO itc_assessment_results (
-        employee_id, employee_id_pno, employee_name, employee_role,
-        department, designation, phone_number, location, 
-        engagement_score, engagement_level, behavioral_profile, sjt_alignment, 
-        category, total_points, badges, engagement_responses, behavioral_responses, sjt_responses, feedback, time_taken_seconds
+        employee_id, 
+        employee_id_pno, 
+        employee_name, 
+        employee_role,
+        department, 
+        designation, 
+        phone_number, 
+        location, 
+        engagement_score, 
+        engagement_level, 
+        behavioral_profile, 
+        sjt_alignment, 
+        category, 
+        total_points, 
+        badges, 
+        engagement_responses, 
+        behavioral_responses, 
+        sjt_responses, 
+        feedback, 
+        time_taken_seconds
       ) VALUES (
-        ${result.employeeId}, ${result.loginInfo?.pNo}, ${result.loginInfo?.employeeName}, ${result.loginInfo?.role},
-        ${result.loginInfo?.department}, ${result.loginInfo?.designation}, ${result.loginInfo?.phoneNumber}, ${result.loginInfo?.location},
-        ${result.engagementScore}, ${result.engagementLevel}, ${JSON.stringify(result.behavioralProfile)}, ${JSON.stringify(result.sjtAlignment)},
-        ${result.category}, ${result.totalPoints}, ${JSON.stringify(result.badges)},
+        ${result.employeeId || 0}, 
+        ${result.loginInfo?.pNo || 'N/A'}, 
+        ${result.loginInfo?.employeeName || 'Anonymous'}, 
+        ${result.loginInfo?.role || 'worker'},
+        ${result.loginInfo?.department || 'N/A'}, 
+        ${result.loginInfo?.designation || 'N/A'}, 
+        ${result.loginInfo?.phoneNumber || 'N/A'}, 
+        ${result.loginInfo?.location || 'N/A'},
+        ${result.engagementScore}, 
+        ${result.engagementLevel}, 
+        ${JSON.stringify(result.behavioralProfile || {})}, 
+        ${JSON.stringify(result.sjtAlignment || {})},
+        ${result.category}, 
+        ${result.totalPoints || 0}, 
+        ${JSON.stringify(result.badges || [])},
         ${JSON.stringify(result.engagementResponses || {})}, 
         ${JSON.stringify(result.behavioralResponses || {})}, 
         ${JSON.stringify(result.sjtResponses || {})},
-        ${result.feedback},
+        ${result.feedback || ''},
         ${result.timeTakenSeconds || 0}
       )
     `;
     return { success: true };
   } catch (error) {
+    console.error('Save Assessment Error:', error);
     return { success: false, error: (error as any).message };
   }
 }
