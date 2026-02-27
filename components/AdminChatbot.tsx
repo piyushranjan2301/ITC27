@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
-import { Send, Bot, User, Loader2, BrainCircuit, Sparkles, MessageSquare, Terminal, X, Minimize2, Maximize2, Table, List, BarChart3 } from 'lucide-react';
+import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
+import { Send, Bot, User, Loader2, BrainCircuit, Sparkles, MessageSquare, Terminal, X, Minimize2, Maximize2, Table, List, BarChart3, Search } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface Props {
@@ -44,6 +44,22 @@ const AdminChatbot: React.FC<Props> = ({ assessmentData, userData }) => {
       }
 
       const ai = new GoogleGenAI({ apiKey });
+
+      // Define Search Tool
+      const searchTool: FunctionDeclaration = {
+        name: "search_employee_records",
+        description: "Search for a specific employee's assessment data or profile by name or P.NO.",
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            query: {
+              type: Type.STRING,
+              description: "The name or P.NO of the employee to search for."
+            }
+          },
+          required: ["query"]
+        }
+      };
       
       // Richer Data Context for the AI
       const deptStats: Record<string, { total: number, count: number, engagement: number }> = {};
@@ -124,12 +140,14 @@ const AdminChatbot: React.FC<Props> = ({ assessmentData, userData }) => {
         - If the user asks for a summary, provide a "Executive Summary" table.
         - If the user asks for comparisons, use a "Comparative Analysis" table.
         - Always end with a "Strategic Recommendation" section.
+        - If you use the search tool, present the specific findings in a "Deep Search Result" card format using Markdown.
       `;
 
       const chat = ai.chats.create({
         model: 'gemini-3-flash-preview',
         config: {
           systemInstruction: systemInstruction,
+          tools: [{ functionDeclarations: [searchTool] }]
         },
         history: messages.length > 1 ? messages.slice(1).map(m => ({
           role: m.role,
@@ -137,8 +155,44 @@ const AdminChatbot: React.FC<Props> = ({ assessmentData, userData }) => {
         })) : []
       });
 
-      const result = await chat.sendMessage({ message: userMessage });
-      const aiText = result.text || "I was unable to generate a response. Please check the data context.";
+      let response = await chat.sendMessage({ message: userMessage });
+      
+      // Handle Function Calls (Deep Search)
+      if (response.functionCalls) {
+        const toolResponses = [];
+        for (const call of response.functionCalls) {
+          if (call.name === "search_employee_records") {
+            const query = (call.args as any).query.toLowerCase();
+            const results = assessmentData.filter(a => 
+              (a.loginInfo?.employeeName || "").toLowerCase().includes(query) || 
+              (a.loginInfo?.pNo || "").toLowerCase().includes(query)
+            ).map(a => ({
+              name: a.loginInfo?.employeeName,
+              pNo: a.loginInfo?.pNo,
+              dept: a.loginInfo?.department,
+              score: a.engagementScore,
+              points: a.totalPoints,
+              category: a.category,
+              feedback: a.feedback,
+              date: a.created_at
+            }));
+
+            toolResponses.push({
+              functionResponse: {
+                name: call.name,
+                response: { results: results.length > 0 ? results : "No matching records found in the Neon registry." }
+              }
+            });
+          }
+        }
+
+        // Send tool responses back to model
+        response = await chat.sendMessage({
+          message: toolResponses
+        });
+      }
+
+      const aiText = response.text || "I was unable to generate a response. Please check the data context.";
       
       setMessages(prev => [...prev, { role: 'model', text: aiText }]);
     } catch (err: any) {
