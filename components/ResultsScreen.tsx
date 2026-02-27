@@ -16,6 +16,7 @@ import { fetchAssessmentResults } from '../db';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ITCLogo from './ITCLogo';
+import ReactMarkdown from 'react-markdown';
 
 interface Props {
   language: Language;
@@ -77,7 +78,10 @@ const ResultsScreen: React.FC<Props> = ({ language, results, responses }) => {
   const generateAIInsight = async () => {
     setAnalyzing(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+      if (!apiKey) throw new Error("API_KEY_MISSING");
+
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Act as a helpful ITC Career Guide. Summarize this worker's profile for them.
       - Worker Name: ${results.loginInfo?.employeeName}
       - Achievement Category: ${results.category}
@@ -466,7 +470,13 @@ const ResultsScreen: React.FC<Props> = ({ language, results, responses }) => {
                   <Sparkles className="w-8 h-8 shrink-0" />
                   <div className="space-y-2">
                     <h3 className="text-xl font-black">{language === 'hi' ? 'मददगार सुझाव' : 'Helpful Tips'}</h3>
-                    {analyzing ? <Loader2 className="w-5 h-5 animate-spin" /> : <p className="text-lg opacity-90 italic">"{aiAnalysis}"</p>}
+                    {analyzing ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <div className="text-lg opacity-90 italic prose prose-invert max-w-none">
+                        <ReactMarkdown>{aiAnalysis || ""}</ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                 </div>
              </div>

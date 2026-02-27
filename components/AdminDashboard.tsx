@@ -29,6 +29,8 @@ import {
 import ITCLogo from './ITCLogo';
 import AdminChatbot from './AdminChatbot';
 
+import ReactMarkdown from 'react-markdown';
+
 interface Props {
   onBack: () => void;
   currentUser: any;
@@ -233,9 +235,10 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
     setAnalyzing(true);
     setAiInsight(null);
     try {
-      if (!process.env.API_KEY) throw new Error("API Key Missing");
+      const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+      if (!apiKey) throw new Error("API Key Missing");
       
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Act as a senior HR analyst for ITC. Analyze this workforce survey dataset:
       - Participants: ${assessmentData.length}
       - Avg Engagement Pulse: ${stats.avgEngagement.toFixed(2)} / 5.0
@@ -714,8 +717,8 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
            </div>
            {aiInsight && (
              <div className="bg-white dark:bg-slate-900 p-12 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-xl animate-in fade-in zoom-in-95 duration-500">
-                <div className="prose prose-slate dark:prose-invert max-w-none">
-                   <div className="whitespace-pre-wrap font-medium text-lg text-slate-700 dark:text-slate-300 leading-relaxed">{aiInsight}</div>
+                <div className="prose prose-slate dark:prose-invert max-w-none font-medium text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
+                   <ReactMarkdown>{aiInsight}</ReactMarkdown>
                 </div>
              </div>
            )}
