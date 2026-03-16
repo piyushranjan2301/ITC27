@@ -8,20 +8,51 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_zckqGUED3i8L@ep-wandering-math-adclj848-pooler.c-2.us-east-1.aws.neon.tech/neondb';
-const sql = neon(DATABASE_URL);
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception thrown:', err);
+});
 
 async function startServer() {
+  console.log('--- SERVER STARTUP SEQUENCE START ---');
+  console.log('Node Version:', process.version);
+  console.log('Environment:', process.env.NODE_ENV);
+  
+  const sql = neon(DATABASE_URL);
   const app = express();
   const PORT = 3000;
 
+  // CRITICAL: Bind to port immediately to satisfy platform health checks
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening on port ${PORT} (Startup in progress...)`);
+  });
+
+  console.log('Configuring middleware...');
   app.use(express.json());
+
+  app.get('/health', (req, res) => {
+    res.send('OK');
+  });
+
+  // Log all requests for debugging
+  app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+  });
 
   // Database initialization logic
   let isDbInitialized = false;
   async function initDatabase() {
     if (isDbInitialized) return;
     try {
+      console.log('Initializing database...');
+      await sql`SELECT 1`;
+      console.log('Database connection verified.');
       await sql`
         CREATE TABLE IF NOT EXISTS itc_users (
           id SERIAL PRIMARY KEY,
@@ -78,6 +109,7 @@ async function startServer() {
         `;
       }
       isDbInitialized = true;
+      console.log('Database initialized successfully.');
     } catch (error) {
       console.error('Database Init Error:', error);
     }
@@ -144,14 +176,22 @@ async function startServer() {
 
   app.post('/api/db/login', async (req, res) => {
     const { pNo, securityKey } = req.body;
-    await initDatabase();
     try {
+      await initDatabase();
       const user = await sql`SELECT * FROM itc_users WHERE employee_id_pno = ${pNo} LIMIT 1`;
-      if (user.length === 0) return res.json({ success: false, error: 'USER_NOT_FOUND' });
-      if (user[0].password !== securityKey) return res.json({ success: false, error: 'INCORRECT_KEY' });
+      if (user.length === 0) {
+        console.log(`Login failed: User ${pNo} not found`);
+        return res.json({ success: false, error: 'USER_NOT_FOUND' });
+      }
+      if (user[0].password !== securityKey) {
+        console.log(`Login failed: Incorrect key for user ${pNo}`);
+        return res.json({ success: false, error: 'INCORRECT_KEY' });
+      }
+      console.log(`Login successful for user ${pNo}`);
       res.json({ success: true, user: user[0] });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'CONNECTION_FAILED' });
+      console.error('Login Route Error:', error);
+      res.status(500).json({ success: false, error: 'CONNECTION_FAILED', details: (error as any).message });
     }
   });
 
@@ -280,22 +320,58 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
+    try {
+      console.log('Initializing Vite middleware (with 30s timeout)...');
+      const vitePromise = createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Vite initialization timed out')), 30000)
+      );
+
+      const vite = await Promise.race([vitePromise, timeoutPromise]) as any;
+      app.use(vite.middlewares);
+      
+      app.get('*all', async (req, res, next) => {
+        if (req.originalUrl.startsWith('/api')) return next();
+        try {
+          const fs = await import('fs');
+          let template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+          template = await vite.transformIndexHtml(req.originalUrl, template);
+          res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+        } catch (e) {
+          console.error('Vite HTML Transform Error:', e);
+          next(e);
+        }
+      });
+
+      console.log('Vite middleware initialized successfully.');
+    } catch (viteError) {
+      console.error('CRITICAL: Failed to initialize Vite middleware:', viteError);
+    }
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*all', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  // Final initialization
+  console.log('Starting background initialization tasks...');
+  
+  // Initialize database in background
+  setTimeout(async () => {
+    try {
+      await initDatabase();
+    } catch (err) {
+      console.error('Background Database Init Error:', err);
+    }
+  }, 100);
+
+  console.log('--- SERVER STARTUP SEQUENCE COMPLETE (Middleware attached) ---');
 }
 
 startServer();

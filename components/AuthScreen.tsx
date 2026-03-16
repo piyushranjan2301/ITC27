@@ -55,8 +55,8 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
         };
       default:
         return {
-          message: 'Access Denied',
-          hint: 'An unexpected authentication error occurred. Please verify your credentials and attempt to enter the terminal again.'
+          message: `Access Denied (${code})`,
+          hint: inputPNo ? `An unexpected authentication error occurred for P.NO "${inputPNo}". Please verify your credentials and attempt to enter the terminal again.` : 'An unexpected authentication error occurred. Please verify your credentials and attempt to enter the terminal again.'
         };
     }
   };
