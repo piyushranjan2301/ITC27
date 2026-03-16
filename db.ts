@@ -2,11 +2,13 @@
 import { ScoringResult } from './types';
 
 async function apiRequest(path: string, method: string = 'GET', body?: any) {
+  console.log(`apiRequest: ${method} ${path}`);
   const response = await fetch(path, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });
+  console.log(`apiResponse: ${response.status} ${path}`);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || `API Error: ${response.status}`);

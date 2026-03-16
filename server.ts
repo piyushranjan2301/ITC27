@@ -27,13 +27,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // CRITICAL: Bind to port immediately to satisfy platform health checks
-  const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server listening on port ${PORT} (Startup in progress...)`);
-  });
-
   console.log('Configuring middleware...');
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
   app.get('/health', (req, res) => {
     res.send('OK');
@@ -112,7 +108,15 @@ async function startServer() {
       console.log('Database initialized successfully.');
     } catch (error) {
       console.error('Database Init Error:', error);
+      throw error; // Propagate error during startup
     }
+  }
+
+  // Pre-initialize database
+  try {
+    await initDatabase();
+  } catch (dbError) {
+    console.error('FAILED TO INITIALIZE DATABASE ON STARTUP. Server will still start but API may fail.');
   }
 
   // API Routes
@@ -157,6 +161,7 @@ async function startServer() {
   });
 
   app.post('/api/db/register', async (req, res) => {
+    console.log('POST /api/db/register reached');
     const { user } = req.body;
     await initDatabase();
     try {
@@ -175,9 +180,9 @@ async function startServer() {
   });
 
   app.post('/api/db/login', async (req, res) => {
+    console.log(`POST /api/db/login reached. Body: ${JSON.stringify(req.body)}`);
     const { pNo, securityKey } = req.body;
     try {
-      await initDatabase();
       const user = await sql`SELECT * FROM itc_users WHERE employee_id_pno = ${pNo} LIMIT 1`;
       if (user.length === 0) {
         console.log(`Login failed: User ${pNo} not found`);
@@ -318,6 +323,12 @@ async function startServer() {
     }
   });
 
+  // Catch-all for unmatched API routes
+  app.all('/api/*', (req, res) => {
+    console.log(`404 - Unmatched API Route: ${req.method} ${req.url}`);
+    res.status(404).json({ success: false, error: `API Route Not Found: ${req.method} ${req.url}` });
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     try {
@@ -334,19 +345,6 @@ async function startServer() {
       const vite = await Promise.race([vitePromise, timeoutPromise]) as any;
       app.use(vite.middlewares);
       
-      app.get('*all', async (req, res, next) => {
-        if (req.originalUrl.startsWith('/api')) return next();
-        try {
-          const fs = await import('fs');
-          let template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
-          template = await vite.transformIndexHtml(req.originalUrl, template);
-          res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
-        } catch (e) {
-          console.error('Vite HTML Transform Error:', e);
-          next(e);
-        }
-      });
-
       console.log('Vite middleware initialized successfully.');
     } catch (viteError) {
       console.error('CRITICAL: Failed to initialize Vite middleware:', viteError);
@@ -354,24 +352,17 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*all', (req, res) => {
+    app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
   // Final initialization
-  console.log('Starting background initialization tasks...');
-  
-  // Initialize database in background
-  setTimeout(async () => {
-    try {
-      await initDatabase();
-    } catch (err) {
-      console.error('Background Database Init Error:', err);
-    }
-  }, 100);
+  console.log('--- SERVER STARTUP SEQUENCE COMPLETE ---');
 
-  console.log('--- SERVER STARTUP SEQUENCE COMPLETE (Middleware attached) ---');
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
 }
 
 startServer();
