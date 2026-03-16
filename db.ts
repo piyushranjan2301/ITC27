@@ -18,6 +18,9 @@ async function apiRequest(path: string, method: string = 'GET', body?: any) {
 
 export async function testDatabaseConnection() {
   try {
+    console.log('Testing Root API Ping...');
+    const ping = await fetch('/api-ping').then(r => r.json()).catch(() => ({}));
+    console.log('Root API Ping Result:', ping);
     return await apiRequest('/api/db/test');
   } catch (error) {
     return { success: false, error: (error as any).message };

@@ -19,7 +19,7 @@ import ResultsScreen from './components/ResultsScreen';
 import AdminDashboard from './components/AdminDashboard';
 import ITCLogo from './components/ITCLogo';
 import { LogOut, Loader2, Moon, Sun } from 'lucide-react';
-import { saveAssessmentResult, fetchResultByPNo, getTotalAnsweredQuestionsCount } from './db';
+import { saveAssessmentResult, fetchResultByPNo, getTotalAnsweredQuestionsCount, testDatabaseConnection } from './db';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -42,6 +42,12 @@ const App: React.FC = () => {
     behavioralResponses: {},
     sjtResponses: {}
   });
+  
+  useEffect(() => {
+    testDatabaseConnection().then(res => {
+      console.log('Initial DB Connection Test:', res);
+    });
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('itc_theme', isDarkMode ? 'dark' : 'light');
@@ -327,7 +333,7 @@ const App: React.FC = () => {
       </header>
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">{renderContent()}</main>
       <footer className="py-12 text-center text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 transition-colors">
-        <p>&copy; 2026 ITC Limited - Operational Excellence Intelligence</p>
+        <p>&copy; 2024 ITC Limited - Operational Excellence Intelligence</p>
       </footer>
     </div>
   );

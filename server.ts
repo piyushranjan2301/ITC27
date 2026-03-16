@@ -31,10 +31,6 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  app.get('/health', (req, res) => {
-    res.send('OK');
-  });
-
   // Log all requests for debugging
   app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url} (Path: ${req.path})`);
@@ -122,6 +118,10 @@ async function startServer() {
   }
 
   // API Routes
+  app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString() });
+  });
+
   app.get('/api/db/test', async (req, res) => {
     try {
       await sql`SELECT 1`;
@@ -163,8 +163,9 @@ async function startServer() {
   });
 
   app.post(['/api/db/register', '/api/db/register/'], async (req, res) => {
-    console.log('POST /api/db/register reached');
-    const { user } = req.body;
+    console.log(`POST /api/db/register reached. Body keys: ${Object.keys(req.body || {})}`);
+    const { user } = req.body || {};
+    if (!user) return res.status(400).json({ success: false, error: 'MISSING_USER_DATA' });
     await initDatabase();
     try {
       const checkPno = await sql`SELECT id FROM itc_users WHERE employee_id_pno = ${user.pNo} LIMIT 1`;
@@ -182,8 +183,14 @@ async function startServer() {
   });
 
   app.post(['/api/db/login', '/api/db/login/'], async (req, res) => {
-    console.log(`POST /api/db/login reached. Body: ${JSON.stringify(req.body)}`);
-    const { pNo, securityKey } = req.body;
+    console.log(`POST /api/db/login reached. Body keys: ${Object.keys(req.body || {})}`);
+    const { pNo, securityKey } = req.body || {};
+    
+    if (!pNo || !securityKey) {
+      console.log('Login failed: Missing credentials');
+      return res.status(400).json({ success: false, error: 'MISSING_CREDENTIALS' });
+    }
+
     try {
       const user = await sql`SELECT * FROM itc_users WHERE employee_id_pno = ${pNo} LIMIT 1`;
       if (user.length === 0) {
@@ -325,10 +332,18 @@ async function startServer() {
     }
   });
 
+  app.get('/api-ping', (req, res) => {
+    res.json({ success: true, message: 'Root API Ping OK', time: new Date().toISOString() });
+  });
+
   // Catch-all for unmatched API routes
   app.all('/api/*', (req, res) => {
     console.log(`404 - Unmatched API Route: ${req.method} ${req.url} (Path: ${req.path})`);
     res.status(404).json({ success: false, error: `API Route Not Found: ${req.method} ${req.url}` });
+  });
+
+  app.get('/health', (req, res) => {
+    res.send('OK');
   });
 
   // Vite middleware for development

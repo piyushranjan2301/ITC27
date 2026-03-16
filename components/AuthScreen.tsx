@@ -26,6 +26,12 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
   const [recoveryCode, setRecoveryCode] = useState('');
   const [newKey, setNewKey] = useState('');
 
+  const [dbStatus, setDbStatus] = useState<{ success: boolean; error?: string } | null>(null);
+
+  React.useEffect(() => {
+    testDatabaseConnection().then(setDbStatus);
+  }, []);
+
   const getFriendlyErrorMessage = (code: string, inputPNo?: string) => {
     switch (code) {
       case 'USER_NOT_FOUND':
@@ -308,7 +314,14 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
           </button>
         </form>
 
-        <div className="text-center pt-8 border-t border-slate-50 dark:border-slate-800 relative z-10">
+        <div className="text-center pt-8 border-t border-slate-50 dark:border-slate-800 relative z-10 space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${dbStatus?.success ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse'}`} />
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+              {dbStatus === null ? 'Checking ITC Vault Connection...' : dbStatus.success ? 'ITC Vault Securely Connected' : `Connection Error: ${dbStatus.error}`}
+            </span>
+          </div>
+
           <button 
             type="button"
             onClick={() => setMode('register')}
