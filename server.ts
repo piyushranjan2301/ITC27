@@ -37,7 +37,7 @@ async function startServer() {
 
   // Log all requests for debugging
   app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} (Path: ${req.path})`);
     next();
   });
 
@@ -99,10 +99,12 @@ async function startServer() {
 
       const adminExists = await sql`SELECT id FROM itc_users WHERE employee_id_pno = 'ADMIN-001' LIMIT 1`;
       if (adminExists.length === 0) {
+        console.log('Creating default admin user...');
         await sql`
           INSERT INTO itc_users (username, password, role, full_name, employee_id_pno, department, designation, recovery_code)
           VALUES ('ADMIN-001', 'admin123', 'admin', 'System Administrator', 'ADMIN-001', 'IT & Governance', 'Chief Admin', 'ITC-MASTER-RESET-2024')
         `;
+        console.log('Default admin user created.');
       }
       isDbInitialized = true;
       console.log('Database initialized successfully.');
@@ -160,7 +162,7 @@ async function startServer() {
     }
   });
 
-  app.post('/api/db/register', async (req, res) => {
+  app.post(['/api/db/register', '/api/db/register/'], async (req, res) => {
     console.log('POST /api/db/register reached');
     const { user } = req.body;
     await initDatabase();
@@ -179,7 +181,7 @@ async function startServer() {
     }
   });
 
-  app.post('/api/db/login', async (req, res) => {
+  app.post(['/api/db/login', '/api/db/login/'], async (req, res) => {
     console.log(`POST /api/db/login reached. Body: ${JSON.stringify(req.body)}`);
     const { pNo, securityKey } = req.body;
     try {
@@ -325,7 +327,7 @@ async function startServer() {
 
   // Catch-all for unmatched API routes
   app.all('/api/*', (req, res) => {
-    console.log(`404 - Unmatched API Route: ${req.method} ${req.url}`);
+    console.log(`404 - Unmatched API Route: ${req.method} ${req.url} (Path: ${req.path})`);
     res.status(404).json({ success: false, error: `API Route Not Found: ${req.method} ${req.url}` });
   });
 
@@ -345,6 +347,19 @@ async function startServer() {
       const vite = await Promise.race([vitePromise, timeoutPromise]) as any;
       app.use(vite.middlewares);
       
+      app.get('*', async (req, res, next) => {
+        if (req.path.startsWith('/api')) return next();
+        try {
+          const fs = await import('fs');
+          let template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+          template = await vite.transformIndexHtml(req.url, template);
+          res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+        } catch (e) {
+          console.error('Vite HTML Transform Error:', e);
+          next(e);
+        }
+      });
+
       console.log('Vite middleware initialized successfully.');
     } catch (viteError) {
       console.error('CRITICAL: Failed to initialize Vite middleware:', viteError);
@@ -362,6 +377,12 @@ async function startServer() {
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);
+  });
+
+  // Global error handler
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('Global Error Handler:', err);
+    res.status(500).json({ success: false, error: 'Internal Server Error', details: err.message });
   });
 }
 
