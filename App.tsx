@@ -327,7 +327,7 @@ const App: React.FC = () => {
       </header>
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">{renderContent()}</main>
       <footer className="py-12 text-center text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 transition-colors">
-        <p>&copy; 2024 ITC Limited - Operational Excellence Intelligence</p>
+        <p>&copy; 2026 ITC Limited - Operational Excellence Intelligence</p>
       </footer>
     </div>
   );
