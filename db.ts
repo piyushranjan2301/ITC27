@@ -10,8 +10,20 @@ async function apiRequest(path: string, method: string = 'GET', body?: any) {
   });
   console.log(`apiResponse: ${response.status} ${path}`);
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `API Error: ${response.status}`);
+    const contentType = response.headers.get('content-type');
+    let errorMessage = `API Error: ${response.status}`;
+    
+    if (contentType && contentType.includes('application/json')) {
+      const errorData = await response.json().catch(() => ({}));
+      errorMessage = errorData.error || errorMessage;
+    } else {
+      const text = await response.text().catch(() => '');
+      console.error('Non-JSON error response:', text.substring(0, 200));
+      if (response.status === 404) {
+        errorMessage = 'API Endpoint Not Found (404). If you are on Netlify, please note that this app requires a Node.js backend which Netlify static hosting does not provide by default.';
+      }
+    }
+    throw new Error(errorMessage);
   }
   return response.json();
 }
