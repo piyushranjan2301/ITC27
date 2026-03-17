@@ -36,11 +36,11 @@ const InstitutionalizationScreen: React.FC<Props> = ({ language, onComplete }) =
   return (
     <div className="max-w-4xl mx-auto space-y-10 py-6 animate-in fade-in duration-700">
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-100 transition-colors">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-amber-100 transition-colors">
           <Flag className="w-3 h-3" />
           {language === 'hi' ? 'चरण 5: संस्थागतकरण' : 'PHASE 5: INSTITUTIONALIZATION'}
         </div>
-        <h2 className="text-3xl font-black text-slate-900 transition-colors">
+        <h2 className="text-3xl font-semibold text-slate-900 transition-colors">
           {language === 'hi' ? 'हम इसे कैसे लागू करते हैं' : 'Our Implementation Roadmap'}
         </h2>
       </div>
@@ -53,8 +53,8 @@ const InstitutionalizationScreen: React.FC<Props> = ({ language, onComplete }) =
             </div>
             <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-3xl border border-slate-100 bg-white shadow-sm transition-all hover:shadow-md">
               <div className="flex items-center justify-between space-x-2 mb-1">
-                <div className="font-black text-slate-900">{language === 'hi' ? step.titleHi : step.titleEn}</div>
-                <time className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${step.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{step.status}</time>
+                <div className="font-semibold text-slate-900">{language === 'hi' ? step.titleHi : step.titleEn}</div>
+                <time className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${step.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{step.status}</time>
               </div>
               <div className="text-slate-500 text-xs font-medium">{language === 'hi' ? step.descHi : step.descEn}</div>
             </div>
@@ -66,7 +66,7 @@ const InstitutionalizationScreen: React.FC<Props> = ({ language, onComplete }) =
         <div className="bg-red-50 border border-red-100 p-6 rounded-3xl flex items-start gap-4 transition-colors">
           <ShieldAlert className="w-8 h-8 text-red-500 shrink-0" />
           <div className="space-y-1">
-            <h4 className="font-bold text-red-900">{language === 'hi' ? 'जोखिम न्यूनीकरण' : 'Risk Mitigation'}</h4>
+            <h4 className="font-semibold text-red-900">{language === 'hi' ? 'जोखिम न्यूनीकरण' : 'Risk Mitigation'}</h4>
             <p className="text-xs text-red-700 leading-relaxed transition-colors">
               {language === 'hi' 
                 ? 'हम डेटा सुरक्षा सुनिश्चित करते हैं और पारदर्शिता बनाए रखने के लिए टॉर्चबियरर्स का उपयोग करते हैं।' 
@@ -77,7 +77,7 @@ const InstitutionalizationScreen: React.FC<Props> = ({ language, onComplete }) =
         <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl flex items-start gap-4 transition-colors">
           <Users className="w-8 h-8 text-blue-500 shrink-0" />
           <div className="space-y-1">
-            <h4 className="font-bold text-blue-900">{language === 'hi' ? 'पुल रणनीति' : 'Pull Strategy'}</h4>
+            <h4 className="font-semibold text-blue-900">{language === 'hi' ? 'पुल रणनीति' : 'Pull Strategy'}</h4>
             <p className="text-xs text-blue-700 leading-relaxed transition-colors">
               {language === 'hi' 
                 ? 'यह अनिवार्य नहीं है - टीजीडब्ल्यू स्वयं सक्रिय भाग लेते हैं।' 
@@ -90,7 +90,7 @@ const InstitutionalizationScreen: React.FC<Props> = ({ language, onComplete }) =
       <div className="flex justify-center pt-4">
         <button 
           onClick={onComplete}
-          className="group flex items-center gap-3 bg-blue-900 text-white px-10 py-5 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-800 transition-all active:scale-95"
+          className="group flex items-center gap-3 bg-blue-900 text-white px-10 py-5 rounded-2xl font-semibold text-lg shadow-2xl hover:bg-blue-800 transition-all active:scale-95"
         >
           {language === 'hi' ? 'निष्कर्ष और सारांश' : 'Final Summary & Rewards'}
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

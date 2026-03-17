@@ -110,10 +110,10 @@ const EngagementScreen: React.FC<Props> = ({ language, questions, onComplete, gl
           </div>
         </div>
         <div className="space-y-3">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
             {language === 'hi' ? 'आपकी आवाज़ सुनी गई!' : 'Your Voice Matters!'}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">
+          <p className="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-[0.3em]">
             {adaptiveMode === 'Leadership' 
               ? (language === 'hi' ? 'उच्च मनोबल - नेतृत्व पथ' : 'High Morale - Leadership Path Detected')
               : adaptiveMode === 'Support'
@@ -133,7 +133,7 @@ const EngagementScreen: React.FC<Props> = ({ language, questions, onComplete, gl
   return (
     <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="space-y-2">
-        <div className="flex justify-between items-center text-[11px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest">
+        <div className="flex justify-between items-center text-[11px] font-semibold text-blue-900 dark:text-blue-400 uppercase tracking-widest">
           <div className="flex items-center gap-2">
             <span>{language === 'hi' ? 'चरण 1: जुड़ाव' : 'PHASE 1: ENGAGEMENT'}</span>
             {adaptiveMode && <span className="text-indigo-500 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Targeted</span>}
@@ -163,14 +163,14 @@ const EngagementScreen: React.FC<Props> = ({ language, questions, onComplete, gl
         
         <div className="flex-1 space-y-8 relative z-10">
           <div className="space-y-4">
-            <span className={`inline-block px-4 py-1.5 text-[10px] font-black rounded-full uppercase tracking-widest border transition-all ${
+            <span className={`inline-block px-4 py-1.5 text-[10px] font-semibold rounded-full uppercase tracking-widest border transition-all ${
               adaptiveMode === 'Leadership' ? 'bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 border-orange-100 dark:border-orange-900/30' :
               adaptiveMode === 'Support' ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-900/30' :
               'bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-900/30'
             }`}>
               {currentQuestion.dimension} Analysis
             </span>
-            <h3 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-[1.15] tracking-tight transition-colors">
+            <h3 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white leading-[1.15] tracking-tight transition-colors">
               {language === 'hi' ? currentQuestion.textHi : currentQuestion.textEn}
             </h3>
           </div>
@@ -193,7 +193,7 @@ const EngagementScreen: React.FC<Props> = ({ language, questions, onComplete, gl
                     {emojis[idx]}
                   </span>
                   <div className="flex-1">
-                    <p className={`font-black text-sm uppercase tracking-widest ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>{label}</p>
+                    <p className={`font-semibold text-sm uppercase tracking-widest ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>{label}</p>
                   </div>
                 </button>
               );
@@ -205,7 +205,7 @@ const EngagementScreen: React.FC<Props> = ({ language, questions, onComplete, gl
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black transition-all text-[11px] uppercase tracking-[0.2em] ${
+            className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold transition-all text-[11px] uppercase tracking-[0.2em] ${
               currentIndex === 0 ? 'opacity-0' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
@@ -216,7 +216,7 @@ const EngagementScreen: React.FC<Props> = ({ language, questions, onComplete, gl
           <button
             onClick={handleNext}
             disabled={!isSelected}
-            className={`flex items-center gap-3 px-12 py-5 rounded-[2rem] font-black text-[12px] uppercase tracking-[0.2em] transition-all shadow-2xl ${
+            className={`flex items-center gap-3 px-12 py-5 rounded-[2rem] font-semibold text-[12px] uppercase tracking-[0.2em] transition-all shadow-2xl ${
               isSelected 
               ? 'bg-indigo-600 text-white hover:bg-indigo-500 hover:shadow-indigo-200 transform active:scale-95' 
               : 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-700'

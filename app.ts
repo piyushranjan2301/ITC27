@@ -4,14 +4,9 @@ import { neon } from '@neondatabase/serverless';
 
 const app = express();
 
-let DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
 
-if (DATABASE_URL.startsWith('psql ')) {
-  DATABASE_URL = DATABASE_URL.replace(/^psql\s+['"]?|['"]?$/g, '');
-}
-DATABASE_URL = DATABASE_URL.replace(/^['"]|['"]$/g, '');
-
-const sql = neon(DATABASE_URL);
+const sql = neon(DATABASE_URL.replace(/^psql\s+/, '').replace(/^['"]|['"]$/g, ''));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,9 +29,18 @@ async function initDatabase() {
         phone_number TEXT,
         location TEXT,
         recovery_code TEXT,
+        is_locked BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `;
+    
+    // Migration: Add is_locked column if it doesn't exist (for existing tables)
+    try {
+      await sql`ALTER TABLE itc_users ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE`;
+    } catch (e) {
+      console.log('Migration info: is_locked column might already exist or table is being created.');
+    }
+
     await sql`
       CREATE TABLE IF NOT EXISTS itc_assessment_results (
         id SERIAL PRIMARY KEY,
@@ -97,6 +101,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+app.get('/api-ping', (req, res) => {
+  res.json({ success: true, timestamp: new Date().toISOString() });
+});
+
 app.get('/api/db/test', async (req, res) => {
   try {
     await sql`SELECT 1`;
@@ -127,6 +135,7 @@ app.post('/api/db/login', async (req, res) => {
   try {
     const user = await sql`SELECT * FROM itc_users WHERE employee_id_pno = ${pNo} LIMIT 1`;
     if (user.length === 0) return res.json({ success: false, error: 'USER_NOT_FOUND' });
+    if (user[0].is_locked && user[0].role !== 'admin') return res.json({ success: false, error: 'ACCOUNT_LOCKED' });
     if (user[0].password !== securityKey) return res.json({ success: false, error: 'INCORRECT_KEY' });
     res.json({ success: true, user: user[0] });
   } catch (error) {
@@ -157,6 +166,12 @@ app.post('/api/db/save-result', async (req, res) => {
         ${result.feedback || ''}, ${result.timeTakenSeconds || 0}
       )
     `;
+    
+    // Lock the user account after submission (except for admins)
+    if (result.loginInfo?.pNo && result.loginInfo?.role !== 'admin') {
+      await sql`UPDATE itc_users SET is_locked = TRUE WHERE employee_id_pno = ${result.loginInfo.pNo}`;
+    }
+    
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: (error as any).message });
@@ -172,12 +187,91 @@ app.get('/api/db/results', async (req, res) => {
   }
 });
 
+app.get('/api/db/result/:pNo', async (req, res) => {
+  const { pNo } = req.params;
+  try {
+    const result = await sql`SELECT * FROM itc_assessment_results WHERE employee_id_pno = ${pNo} LIMIT 1`;
+    res.json(result[0] || null);
+  } catch (error) {
+    res.json(null);
+  }
+});
+
+app.delete('/api/db/result/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await sql`DELETE FROM itc_assessment_results WHERE id = ${id}`;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as any).message });
+  }
+});
+
 app.get('/api/db/users', async (req, res) => {
   try {
     const users = await sql`SELECT id, role, full_name, employee_id_pno, department, designation, phone_number, location, created_at FROM itc_users ORDER BY created_at DESC`;
     res.json(users);
   } catch (error) {
     res.json([]);
+  }
+});
+
+app.delete('/api/db/user/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await sql`DELETE FROM itc_users WHERE id = ${id}`;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as any).message });
+  }
+});
+
+app.post('/api/db/wipe', async (req, res) => {
+  try {
+    await sql`DELETE FROM itc_assessment_results`;
+    // We don't wipe users to avoid locking ourselves out, or maybe just non-admins?
+    // Usually wipe means everything.
+    await sql`DELETE FROM itc_users WHERE role != 'admin'`;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as any).message });
+  }
+});
+
+app.get('/api/db/questions-count', async (req, res) => {
+  try {
+    const count = await sql`SELECT COUNT(*) as total FROM itc_assessment_results`;
+    res.json({ total: parseInt(count[0].total) });
+  } catch (error) {
+    res.json({ total: 0 });
+  }
+});
+
+app.post('/api/db/update-password', async (req, res) => {
+  const { userId, currentPass, newPass } = req.body;
+  try {
+    const user = await sql`SELECT password FROM itc_users WHERE id = ${userId} LIMIT 1`;
+    if (user.length === 0 || user[0].password !== currentPass) {
+      return res.json({ success: false, error: 'Current password incorrect' });
+    }
+    await sql`UPDATE itc_users SET password = ${newPass} WHERE id = ${userId}`;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as any).message });
+  }
+});
+
+app.post('/api/db/update-recovery', async (req, res) => {
+  const { userId, currentPass, newRecoveryCode } = req.body;
+  try {
+    const user = await sql`SELECT password FROM itc_users WHERE id = ${userId} LIMIT 1`;
+    if (user.length === 0 || user[0].password !== currentPass) {
+      return res.json({ success: false, error: 'Current password incorrect' });
+    }
+    await sql`UPDATE itc_users SET recovery_code = ${newRecoveryCode} WHERE id = ${userId}`;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as any).message });
   }
 });
 

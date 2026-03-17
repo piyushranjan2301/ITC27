@@ -221,10 +221,10 @@ const AdminChatbot: React.FC<Props> = ({ assessmentData, userData }) => {
             <BrainCircuit className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-black text-white tracking-tight">AI Command Center</h3>
+            <h3 className="text-xl font-semibold text-white tracking-tight">AI Command Center</h3>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Neural Sync: ONLINE</p>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Neural Sync: ONLINE</p>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@ const AdminChatbot: React.FC<Props> = ({ assessmentData, userData }) => {
               <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
               <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" />
             </div>
-            <span className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">Processing Data...</span>
+            <span className="text-[10px] font-semibold uppercase text-indigo-500 tracking-widest">Processing Data...</span>
           </div>
         )}
       </div>

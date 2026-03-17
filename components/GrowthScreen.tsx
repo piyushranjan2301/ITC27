@@ -36,11 +36,11 @@ const GrowthScreen: React.FC<Props> = ({ language, onComplete }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-12 py-8 animate-in fade-in zoom-in-95 duration-700">
       <div className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-black uppercase tracking-widest border border-indigo-100 transition-colors">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold uppercase tracking-widest border border-indigo-100 transition-colors">
           <Sparkles className="w-3.5 h-3.5" />
           {language === 'hi' ? 'चरण 5: भविष्य का पथ' : 'PHASE 5: FUTURE PATHWAY'}
         </div>
-        <h2 className="text-4xl font-black text-slate-900 tracking-tight transition-colors">
+        <h2 className="text-4xl font-semibold text-slate-900 tracking-tight transition-colors">
           {language === 'hi' ? 'आपकी विकास यात्रा' : 'Your Growth Journey'}
         </h2>
         <p className="text-slate-500 max-w-2xl mx-auto font-medium transition-colors">
@@ -57,7 +57,7 @@ const GrowthScreen: React.FC<Props> = ({ language, onComplete }) => {
               {card.icon}
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-slate-800 transition-colors">
+              <h3 className="text-xl font-semibold text-slate-800 transition-colors">
                 {language === 'hi' ? card.titleHi : card.titleEn}
               </h3>
               <p className="text-sm text-slate-500 leading-relaxed font-medium transition-colors">
@@ -71,7 +71,7 @@ const GrowthScreen: React.FC<Props> = ({ language, onComplete }) => {
       <div className="bg-blue-900 rounded-[2.5rem] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl transition-all">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-800 rounded-full -mr-32 -mt-32 opacity-20 blur-3xl transition-colors"></div>
         <div className="space-y-3 relative z-10 text-center md:text-left">
-          <h3 className="text-2xl font-bold">
+          <h3 className="text-2xl font-semibold">
             {language === 'hi' ? 'मूल्यांकन पूर्ण करने के लिए तैयार?' : 'Ready to see your final profile?'}
           </h3>
           <p className="text-blue-200 font-medium transition-colors">
@@ -80,7 +80,7 @@ const GrowthScreen: React.FC<Props> = ({ language, onComplete }) => {
         </div>
         <button 
           onClick={onComplete}
-          className="group flex items-center gap-3 bg-white text-blue-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-blue-50 transition-all shadow-xl active:scale-95"
+          className="group flex items-center gap-3 bg-white text-blue-900 px-10 py-5 rounded-2xl font-semibold text-lg hover:bg-blue-50 transition-all shadow-xl active:scale-95"
         >
           {language === 'hi' ? 'निष्कर्ष देखें' : 'View Results'}
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

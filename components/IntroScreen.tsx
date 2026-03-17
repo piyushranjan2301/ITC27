@@ -14,7 +14,7 @@ const IntroScreen: React.FC<Props> = ({ language, onLanguageChange, onStart }) =
   return (
     <div className="flex flex-col items-center justify-center text-center space-y-12 py-12">
       <div className="space-y-4">
-        <h2 className="text-4xl font-extrabold text-blue-900 dark:text-blue-400 leading-tight">
+        <h2 className="text-4xl font-semibold text-blue-900 dark:text-blue-400 leading-tight">
           {language === 'hi' ? 'जुड़ाव सर्वेक्षण' : 'Engagement Survey'}
         </h2>
         <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto font-medium">
@@ -30,10 +30,10 @@ const IntroScreen: React.FC<Props> = ({ language, onLanguageChange, onStart }) =
           <AlertCircle className="w-6 h-6" />
         </div>
         <div>
-          <h4 className="text-amber-900 dark:text-amber-400 font-black uppercase text-[10px] tracking-widest mb-1">
+          <h4 className="text-amber-900 dark:text-amber-400 font-semibold uppercase text-[10px] tracking-widest mb-1">
             {language === 'hi' ? 'एकल प्रयास नीति' : 'Single Attempt Policy'}
           </h4>
-          <p className="text-amber-800 dark:text-amber-400/80 text-sm font-bold leading-tight">
+          <p className="text-amber-800 dark:text-amber-400/80 text-sm font-semibold leading-tight">
             {language === 'hi' 
               ? 'आप इस मूल्यांकन का केवल एक बार प्रयास कर सकते हैं। जमा करने के बाद, आपका खाता बंद कर दिया जाएगा।' 
               : 'You can attempt this assessment only once. After submission, your account will be locked.'}
@@ -43,14 +43,14 @@ const IntroScreen: React.FC<Props> = ({ language, onLanguageChange, onStart }) =
 
       <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border border-gray-100 dark:border-slate-800 w-full max-w-md space-y-8 transition-all">
         <div className="space-y-3">
-          <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.3em] px-2">
+          <label className="flex items-center gap-2 text-[10px] font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-[0.3em] px-2">
             <Languages className="w-4 h-4" />
             {language === 'hi' ? 'अपनी भाषा चुनें' : 'Select your language'}
           </label>
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => onLanguageChange('hi')}
-              className={`py-4 px-6 rounded-2xl font-black border-2 transition-all ${
+              className={`py-4 px-6 rounded-2xl font-semibold border-2 transition-all ${
                 language === 'hi' 
                 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-600 text-blue-600 dark:text-blue-400 shadow-inner' 
                 : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:border-blue-200 hover:text-blue-400'
@@ -60,7 +60,7 @@ const IntroScreen: React.FC<Props> = ({ language, onLanguageChange, onStart }) =
             </button>
             <button
               onClick={() => onLanguageChange('en')}
-              className={`py-4 px-6 rounded-2xl font-black border-2 transition-all ${
+              className={`py-4 px-6 rounded-2xl font-semibold border-2 transition-all ${
                 language === 'en' 
                 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-600 text-blue-600 dark:text-blue-400 shadow-inner' 
                 : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:border-blue-200 hover:text-blue-400'
@@ -73,7 +73,7 @@ const IntroScreen: React.FC<Props> = ({ language, onLanguageChange, onStart }) =
 
         <button
           onClick={onStart}
-          className="w-full bg-blue-600 text-white py-5 px-8 rounded-2xl font-black text-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-all shadow-xl shadow-blue-200 dark:shadow-none flex items-center justify-center gap-3 group transform active:scale-95"
+          className="w-full bg-blue-600 text-white py-5 px-8 rounded-2xl font-semibold text-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-all shadow-xl shadow-blue-200 dark:shadow-none flex items-center justify-center gap-3 group transform active:scale-95"
         >
           {language === 'hi' ? 'शुरू करें' : 'Get Started'}
           <Play className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -88,7 +88,7 @@ const IntroScreen: React.FC<Props> = ({ language, onLanguageChange, onStart }) =
         ].map((item, i) => (
           <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-lg transition-all hover:-translate-y-2">
             <div className="mb-4 bg-slate-50 dark:bg-slate-800 w-12 h-12 rounded-xl flex items-center justify-center">{item.icon}</div>
-            <h3 className="font-black text-slate-900 dark:text-white uppercase text-sm tracking-tight">{item.title}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white uppercase text-sm tracking-tight">{item.title}</h3>
             <p className="text-xs font-medium text-slate-400 mt-1">{item.desc}</p>
           </div>
         ))}

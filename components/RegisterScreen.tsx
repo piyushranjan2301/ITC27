@@ -122,8 +122,8 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
           <CheckCircle2 className="w-12 h-12 text-white" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">सफल पंजीकरण!</h2>
-          <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">ID: {form.pNo}</p>
+          <h2 className="text-3xl font-semibold text-slate-900 uppercase tracking-tighter">सफल पंजीकरण!</h2>
+          <p className="text-slate-500 font-semibold uppercase text-[10px] tracking-[0.3em]">ID: {form.pNo}</p>
         </div>
       </div>
     );
@@ -137,15 +137,15 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
           <div className="flex flex-col md:flex-row items-center gap-6">
             <ITCLogo className="w-16 h-16" variant="color" />
             <div className="space-y-1 text-center md:text-left">
-              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">नया पंजीकरण (New Register)</h2>
-              <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.4em]">Operational Registry</p>
+              <h2 className="text-4xl font-semibold text-slate-900 dark:text-white tracking-tighter">नया पंजीकरण (New Register)</h2>
+              <p className="text-slate-400 font-semibold uppercase text-[10px] tracking-[0.4em]">Operational Registry</p>
             </div>
           </div>
           
           <button 
             type="button"
             onClick={resetForm}
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-rose-600 transition-all font-black uppercase text-[10px] tracking-widest border border-slate-100 dark:border-slate-700"
+            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-rose-600 transition-all font-semibold uppercase text-[10px] tracking-widest border border-slate-100 dark:border-slate-700"
           >
             <RotateCcw className="w-3.5 h-3.5" /> सब साफ़ करें (Clear Form)
           </button>
@@ -153,22 +153,22 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
 
         {error && (
           <div className="mb-8 p-5 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 rounded-2xl flex flex-col gap-1 text-rose-800 dark:text-rose-400">
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest">
+            <div className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-widest">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error.message}</span>
             </div>
-            {error.sub && <p className="text-[9px] font-bold opacity-70 pl-7">{error.sub}</p>}
+            {error.sub && <p className="text-[9px] font-semibold opacity-70 pl-7">{error.sub}</p>}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
                 <Hash className="w-3.5 h-3.5 text-blue-900" /> P.NO (8 Digits)
               </label>
               <input 
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.pNo ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black transition-all outline-none`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.pNo ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold transition-all outline-none`}
                 placeholder="Ex: 12345678"
                 value={form.pNo}
                 onChange={(e) => updateForm('pNo', e.target.value)}
@@ -176,11 +176,11 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
                 <User className="w-3.5 h-3.5 text-blue-900" /> पूरा नाम (Full Name)
               </label>
               <input 
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.fullName ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black transition-all outline-none`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.fullName ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold transition-all outline-none`}
                 placeholder="Employee Name"
                 value={form.fullName}
                 onChange={(e) => updateForm('fullName', e.target.value)}
@@ -188,11 +188,11 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
                 <Building2 className="w-3.5 h-3.5 text-blue-900" /> विभाग (Department)
               </label>
               <select 
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.department ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black outline-none cursor-pointer`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.department ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold outline-none cursor-pointer`}
                 value={form.department}
                 onChange={(e) => updateForm('department', e.target.value)}
               >
@@ -202,7 +202,7 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-3.5 h-3.5 text-blue-900" /> पद (Designation)
                 </div>
@@ -210,14 +210,14 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
                   <button 
                     type="button" 
                     onClick={() => updateForm('designation', '')}
-                    className="text-[9px] font-black text-rose-500 hover:text-rose-700 flex items-center gap-1 group/clear"
+                    className="text-[9px] font-semibold text-rose-500 hover:text-rose-700 flex items-center gap-1 group/clear"
                   >
                     <XCircle className="w-3 h-3 group-hover:scale-110 transition-transform" /> साफ़ करें (Clear Selection)
                   </button>
                 )}
               </label>
               <select 
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.designation ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black outline-none cursor-pointer`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.designation ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold outline-none cursor-pointer`}
                 value={form.designation}
                 onChange={(e) => updateForm('designation', e.target.value)}
               >
@@ -227,12 +227,12 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
                 <Phone className="w-3.5 h-3.5 text-blue-900" /> मोबाइल (Mobile)
               </label>
               <input 
                 type="tel"
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.phoneNumber ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black outline-none`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.phoneNumber ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold outline-none`}
                 placeholder="10-digit number"
                 value={form.phoneNumber}
                 onChange={(e) => updateForm('phoneNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -240,11 +240,11 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
                 <MapPin className="w-3.5 h-3.5 text-blue-900" /> फैक्ट्री (Location)
               </label>
               <select 
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.location ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black outline-none cursor-pointer`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.location ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold outline-none cursor-pointer`}
                 value={form.location}
                 onChange={(e) => updateForm('location', e.target.value)}
               >
@@ -262,12 +262,12 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
 
           <div className="border-t-2 border-slate-50 dark:border-slate-800 pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="w-full md:max-w-xs space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
                 <Key className="w-3.5 h-3.5 text-blue-900" /> सुरक्षा कोड (Pin)
               </label>
               <input 
                 type="password"
-                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-black outline-none tracking-widest`}
+                className={`w-full px-6 py-5 rounded-2xl border-2 ${validationErrors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800'} focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:text-white font-semibold outline-none tracking-widest`}
                 placeholder="••••"
                 value={form.password}
                 onChange={(e) => updateForm('password', e.target.value)}
@@ -278,7 +278,7 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full sm:w-auto px-12 py-6 rounded-[2.5rem] font-black text-lg transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 ${
+                className={`w-full sm:w-auto px-12 py-6 rounded-[2.5rem] font-semibold text-lg transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 ${
                   loading 
                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
                     : 'bg-blue-900 text-white hover:bg-slate-900'
@@ -289,7 +289,7 @@ const RegisterScreen: React.FC<Props> = ({ onSuccess, onBackToLogin }) => {
               <button 
                 type="button"
                 onClick={onBackToLogin}
-                className="w-full sm:w-auto px-10 py-6 rounded-[2.5rem] font-black text-[10px] text-slate-400 uppercase tracking-[0.3em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                className="w-full sm:w-auto px-10 py-6 rounded-[2.5rem] font-semibold text-[10px] text-slate-400 uppercase tracking-[0.3em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
                 पीछे जाएँ (Back)
               </button>

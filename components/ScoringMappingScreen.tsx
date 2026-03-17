@@ -55,11 +55,11 @@ const ScoringMappingScreen: React.FC<Props> = ({ language, onComplete }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in duration-700">
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100 transition-colors">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-indigo-100 transition-colors">
           <Network className="w-3 h-3" />
           {language === 'hi' ? 'चरण 4: व्यवहार मानचित्रण' : 'PHASE 4: BEHAVIORAL MAPPING'}
         </div>
-        <h2 className="text-3xl font-black text-slate-900 leading-tight transition-colors">
+        <h2 className="text-3xl font-semibold text-slate-900 leading-tight transition-colors">
           {language === 'hi' ? 'हम आपकी प्रतिभा का उपयोग कैसे करते हैं' : 'How We Map Your Talent'}
         </h2>
         <p className="text-slate-500 max-w-xl mx-auto font-medium text-sm transition-colors">
@@ -76,10 +76,10 @@ const ScoringMappingScreen: React.FC<Props> = ({ language, onComplete }) => {
               <div className="bg-white p-2 rounded-xl shadow-sm border border-inherit transition-colors">
                 {m.icon}
               </div>
-              <h4 className="font-black text-slate-900 uppercase tracking-tighter transition-colors">{m.trait}</h4>
+              <h4 className="font-semibold text-slate-900 uppercase tracking-tighter transition-colors">{m.trait}</h4>
             </div>
             <div className="space-y-1">
-              <p className="text-lg font-bold text-slate-800 transition-colors">
+              <p className="text-lg font-semibold text-slate-800 transition-colors">
                 {language === 'hi' ? m.roleHi : m.roleEn}
               </p>
               <p className="text-xs text-slate-500 leading-relaxed transition-colors">
@@ -93,7 +93,7 @@ const ScoringMappingScreen: React.FC<Props> = ({ language, onComplete }) => {
       <div className="pt-6 flex justify-center">
         <button 
           onClick={onComplete}
-          className="flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl hover:bg-slate-800 transition-all active:scale-95"
+          className="flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:bg-slate-800 transition-all active:scale-95"
         >
           {language === 'hi' ? 'अगले चरण पर जाएँ' : 'Move to Implementation Phase'}
           <ArrowRight className="w-5 h-5" />

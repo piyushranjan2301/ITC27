@@ -261,7 +261,7 @@ const App: React.FC = () => {
               <ITCLogo className="w-10 h-10" />
             </div>
           </div>
-          <p className="text-blue-900 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">Accessing Secure Vault...</p>
+          <p className="text-blue-900 dark:text-blue-400 font-semibold uppercase tracking-widest text-[10px]">Accessing Secure Vault...</p>
         </div>
       );
     }
@@ -303,8 +303,8 @@ const App: React.FC = () => {
               <ITCLogo className="w-24 h-14" variant="color" />
             </div>
             <div className="hidden md:block">
-              <h1 className="text-xl font-black leading-none tracking-tighter uppercase mb-1">ITC</h1>
-              <p className={`text-[9px] uppercase tracking-[0.3em] font-black opacity-70 ${state.currentPhase === Phase.Admin ? 'text-indigo-400' : 'text-blue-300'}`}>
+              <h1 className="text-xl font-semibold leading-none tracking-tighter uppercase mb-1">ITC</h1>
+              <p className={`text-[9px] uppercase tracking-[0.3em] font-semibold opacity-70 ${state.currentPhase === Phase.Admin ? 'text-indigo-400' : 'text-blue-300'}`}>
                 {state.currentPhase === Phase.Admin ? 'Strategic Intelligence Dashboard' : 'engagement survey'}
               </p>
             </div>
@@ -320,14 +320,14 @@ const App: React.FC = () => {
              </button>
 
              <div className="flex bg-black/20 p-1 rounded-xl border border-white/10">
-                <button onClick={() => setLanguage('en')} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${state.language === 'en' ? 'bg-white text-blue-900 shadow-md' : 'text-white/60 hover:text-white'}`}>EN</button>
-                <button onClick={() => setLanguage('hi')} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${state.language === 'hi' ? 'bg-white text-blue-900 shadow-md' : 'text-white/60 hover:text-white'}`}>HI</button>
+                <button onClick={() => setLanguage('en')} className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-widest transition-all ${state.language === 'en' ? 'bg-white text-blue-900 shadow-md' : 'text-white/60 hover:text-white'}`}>EN</button>
+                <button onClick={() => setLanguage('hi')} className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-widest transition-all ${state.language === 'hi' ? 'bg-white text-blue-900 shadow-md' : 'text-white/60 hover:text-white'}`}>HI</button>
              </div>
              {currentUser && (
                <div className="flex items-center gap-4">
                   <div className="hidden sm:flex flex-col items-end px-4 border-r border-white/10">
-                     <span className="text-xs font-black text-white">{currentUser.full_name}</span>
-                     <span className={`text-[9px] font-black uppercase tracking-widest ${state.currentPhase === Phase.Admin ? 'text-indigo-400' : 'text-blue-300'}`}>{currentUser.employee_id_pno}</span>
+                     <span className="text-xs font-semibold text-white">{currentUser.full_name}</span>
+                     <span className={`text-[9px] font-semibold uppercase tracking-widest ${state.currentPhase === Phase.Admin ? 'text-indigo-400' : 'text-blue-300'}`}>{currentUser.employee_id_pno}</span>
                   </div>
                   <button onClick={logout} className={`p-3 rounded-xl transition-all border shadow-lg ${state.currentPhase === Phase.Admin ? 'bg-slate-800 border-slate-700 hover:bg-rose-600' : 'bg-blue-800 border-blue-700 hover:bg-rose-600'}`}>
                     <LogOut className="w-5 h-5" />
@@ -338,7 +338,7 @@ const App: React.FC = () => {
         </div>
       </header>
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">{renderContent()}</main>
-      <footer className="py-12 text-center text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 transition-colors">
+      <footer className="py-12 text-center text-[10px] uppercase tracking-[0.2em] font-medium text-slate-500 dark:text-slate-400 transition-colors">
         <p>&copy; 2024 ITC Limited - Operational Excellence Intelligence</p>
       </footer>
     </div>

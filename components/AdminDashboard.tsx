@@ -313,31 +313,31 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
              <ITCLogo className="w-16 h-16" variant="color" />
            </div>
            <div>
-             <h3 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{record.loginInfo?.employeeName}</h3>
-             <p className="text-indigo-600 dark:text-indigo-400 font-black tracking-[0.4em] uppercase text-xs mt-2">P.NO: {record.loginInfo?.pNo} • {record.category}</p>
+             <h3 className="text-4xl font-semibold text-slate-900 dark:text-white tracking-tight">{record.loginInfo?.employeeName}</h3>
+             <p className="text-indigo-600 dark:text-indigo-400 font-semibold tracking-[0.4em] uppercase text-xs mt-2">P.NO: {record.loginInfo?.pNo} • {record.category}</p>
            </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700">
-            <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Core Engagement</p>
-            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{(record.engagementScore || 0).toFixed(2)}</div>
-            <p className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full inline-block ${record.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : record.engagementLevel === 'Low' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>{record.engagementLevel}</p>
+            <p className="text-[10px] font-semibold uppercase text-slate-400 mb-4 tracking-widest">Core Engagement</p>
+            <div className="text-5xl font-semibold text-slate-900 dark:text-white mb-1">{(record.engagementScore || 0).toFixed(2)}</div>
+            <p className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block ${record.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : record.engagementLevel === 'Low' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>{record.engagementLevel}</p>
           </div>
           <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700">
-            <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Excellence Points</p>
-            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{record.totalPoints || 0}</div>
-            <p className="text-[10px] font-black uppercase text-slate-400">Total Accumulation</p>
+            <p className="text-[10px] font-semibold uppercase text-slate-400 mb-4 tracking-widest">Excellence Points</p>
+            <div className="text-5xl font-semibold text-slate-900 dark:text-white mb-1">{record.totalPoints || 0}</div>
+            <p className="text-[10px] font-semibold uppercase text-slate-400">Total Accumulation</p>
           </div>
           <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700">
-            <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Badges Earned</p>
-            <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{record.badges?.length || 0}</div>
+            <p className="text-[10px] font-semibold uppercase text-slate-400 mb-4 tracking-widest">Badges Earned</p>
+            <div className="text-5xl font-semibold text-slate-900 dark:text-white mb-1">{record.badges?.length || 0}</div>
             <div className="flex flex-wrap gap-1 mt-2">
               {record.badges?.map((b: string) => <span key={b} className="text-[8px] bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-600">{b}</span>)}
             </div>
           </div>
         </div>
         <div className="mt-8 p-8 bg-indigo-50 dark:bg-indigo-950/20 rounded-[2.5rem]">
-          <p className="text-[10px] font-black uppercase text-indigo-400 mb-4 tracking-widest">Direct Feedback</p>
+          <p className="text-[10px] font-semibold uppercase text-indigo-400 mb-4 tracking-widest">Direct Feedback</p>
           <p className="text-xl font-bold italic text-indigo-900 dark:text-indigo-300">"{record.feedback || 'No feedback recorded.'}"</p>
         </div>
       </div>
@@ -349,11 +349,11 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-2">
-          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-4">
+          <h2 className="text-4xl font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-4">
             <LayoutDashboard className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
             Admin Intelligence Terminal
           </h2>
-          <div className="flex items-center gap-4 text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">
+          <div className="flex items-center gap-4 text-slate-400 font-semibold uppercase text-[10px] tracking-[0.3em]">
             <span>System Status:</span>
             <span className={`flex items-center gap-1.5 ${dbStatus === 'online' ? 'text-emerald-500' : 'text-rose-500'}`}>
               <Database className="w-3 h-3" />
@@ -365,7 +365,7 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
            <button onClick={loadData} className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700">
              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
            </button>
-           <button onClick={onBack} className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase text-xs tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-500/20">
+           <button onClick={onBack} className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-semibold uppercase text-xs tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-500/20">
              Close Console
            </button>
         </div>
@@ -377,7 +377,7 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
           <button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
-            className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all border ${
+            className={`px-8 py-4 rounded-2xl font-semibold text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all border ${
               activeTab === tab 
               ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xl scale-105' 
               : 'bg-white dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -391,7 +391,7 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Synchronizing Encrypted Data...</p>
+          <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Synchronizing Encrypted Data...</p>
         </div>
       ) : activeTab === 'Overview' ? (
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
@@ -407,8 +407,8 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                     {React.cloneElement(s.icon as React.ReactElement<any>, { className: 'w-7 h-7' })}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{s.label}</p>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white">{s.val}</p>
+                    <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-widest">{s.label}</p>
+                    <p className="text-3xl font-semibold text-slate-900 dark:text-white">{s.val}</p>
                   </div>
                 </div>
               ))}
@@ -416,13 +416,13 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
            
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
-                <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Sentiment Trend (7 Days)</h3>
+                <h3 className="text-[10px] font-semibold uppercase text-slate-400 mb-8 tracking-widest">Sentiment Trend (7 Days)</h3>
                 {stats.trendData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={stats.trendData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="date" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
-                      <YAxis tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }} />
+                      <YAxis tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }} />
                       <RechartsTooltip />
                       <Line type="monotone" dataKey="points" stroke="#6366f1" strokeWidth={4} dot={{ r: 6, fill: '#6366f1' }} />
                     </LineChart>
@@ -430,11 +430,11 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                 ) : <div className="flex-1 flex items-center justify-center text-slate-400 italic">Insufficient trend data</div>}
               </div>
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
-                <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Department Benchmarks</h3>
+                <h3 className="text-[10px] font-semibold uppercase text-slate-400 mb-8 tracking-widest">Department Benchmarks</h3>
                 {stats.deptAnalysis.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <RechartsBarChart data={stats.deptAnalysis}>
-                      <XAxis dataKey="name" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} />
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }} />
                       <Bar dataKey="avg" fill="#6366f1" radius={[10, 10, 0, 0]} />
                     </RechartsBarChart>
                   </ResponsiveContainer>
@@ -456,21 +456,21 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                     onChange={e => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <button onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} className={`px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all ${showAdvancedFilters ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
+                <button onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} className={`px-6 py-4 rounded-2xl font-semibold text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all ${showAdvancedFilters ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
                   <SlidersHorizontal className="w-4 h-4" /> Filters
                 </button>
-                <button onClick={exportCSV} className="px-6 py-4 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-500 transition-all">
+                <button onClick={exportCSV} className="px-6 py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-500 transition-all">
                   <Download className="w-4 h-4" /> Export CSV
                 </button>
               </div>
               {showAdvancedFilters && (
                 <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-top-2">
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2"><Calendar className="w-3 h-3" /> Start Date</label>
+                      <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2"><Calendar className="w-3 h-3" /> Start Date</label>
                       <input type="date" className="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold" value={dateStart} onChange={e => setDateStart(e.target.value)} />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2"><Calendar className="w-3 h-3" /> End Date</label>
+                      <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2"><Calendar className="w-3 h-3" /> End Date</label>
                       <input type="date" className="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold" value={dateEnd} onChange={e => setDateEnd(e.target.value)} />
                    </div>
                 </div>
@@ -483,37 +483,37 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
                       {['loginInfo.employeeName', 'loginInfo.pNo', 'engagementScore', 'totalPoints', 'created_at'].map(k => (
-                        <th key={k} onClick={() => handleSort(k)} className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest cursor-pointer hover:text-slate-900 dark:hover:text-white">
+                        <th key={k} onClick={() => handleSort(k)} className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest cursor-pointer hover:text-slate-900 dark:hover:text-white">
                           <div className="flex items-center gap-2">
                             {k.split('.').pop()?.replace('_', ' ')}
                             {sortKey === k && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                           </div>
                         </th>
                       ))}
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Actions</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAssessments.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-8 py-16 text-center text-slate-400 font-bold uppercase tracking-widest italic text-xs">No records found matching your filters</td>
+                        <td colSpan={6} className="px-8 py-16 text-center text-slate-400 font-semibold uppercase tracking-widest italic text-xs">No records found matching your filters</td>
                       </tr>
                     ) : (
                       filteredAssessments.map(row => (
                         <tr key={row.id} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all group">
                           <td className="px-8 py-6">
-                             <p className="font-black text-slate-900 dark:text-white">{row.loginInfo?.employeeName || 'N/A'}</p>
-                             <p className="text-[9px] font-bold text-slate-400 uppercase">{row.loginInfo?.department || 'N/A'}</p>
+                             <p className="font-semibold text-slate-900 dark:text-white">{row.loginInfo?.employeeName || 'N/A'}</p>
+                             <p className="text-[9px] font-semibold text-slate-400 uppercase">{row.loginInfo?.department || 'N/A'}</p>
                           </td>
                           <td className="px-8 py-6 font-mono font-bold text-slate-500">{row.loginInfo?.pNo || 'N/A'}</td>
                           <td className="px-8 py-6">
                              <div className="flex items-center gap-3">
-                               <span className="font-black text-slate-900 dark:text-white">{(row.engagementScore || 0).toFixed(2)}</span>
-                               <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${row.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{row.engagementLevel || 'N/A'}</span>
+                               <span className="font-semibold text-slate-900 dark:text-white">{(row.engagementScore || 0).toFixed(2)}</span>
+                               <span className={`text-[8px] font-semibold uppercase px-2 py-0.5 rounded-full ${row.engagementLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{row.engagementLevel || 'N/A'}</span>
                              </div>
                           </td>
                           <td className="px-8 py-6">
-                             <span className="font-black text-indigo-600 dark:text-indigo-400">{row.totalPoints || 0}</span>
+                             <span className="font-semibold text-indigo-600 dark:text-indigo-400">{row.totalPoints || 0}</span>
                           </td>
                           <td className="px-8 py-6 text-[10px] font-bold text-slate-400">{row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A'}</td>
                           <td className="px-8 py-6">
@@ -534,7 +534,7 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
-                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Badge Distribution</h3>
+                 <h3 className="text-[10px] font-semibold uppercase text-slate-400 mb-8 tracking-widest">Badge Distribution</h3>
                  {stats.badgeAnalysis.length > 0 ? (
                    <ResponsiveContainer width="100%" height="100%">
                       <RechartsPieChart>
@@ -556,12 +556,12 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                  ) : <div className="flex-1 flex items-center justify-center text-slate-400 italic">No badges issued yet</div>}
               </div>
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm h-[400px] flex flex-col">
-                 <h3 className="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest">Performance Tiers</h3>
+                 <h3 className="text-[10px] font-semibold uppercase text-slate-400 mb-8 tracking-widest">Performance Tiers</h3>
                  {stats.categoryAnalysis.length > 0 ? (
                    <ResponsiveContainer width="100%" height="100%">
                       <RechartsBarChart layout="vertical" data={stats.categoryAnalysis}>
                          <XAxis type="number" hide />
-                         <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} width={120} />
+                         <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }} width={120} />
                          <RechartsTooltip />
                          <Bar dataKey="value" fill="#10b981" radius={[0, 10, 10, 0]} />
                       </RechartsBarChart>
@@ -572,21 +572,21 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
            <div className="bg-white dark:bg-slate-900 p-10 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm">
               <div className="flex items-center gap-4 mb-8">
                  <Crown className="w-8 h-8 text-amber-500" />
-                 <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Top Performers Leaderboard</h3>
+                 <h3 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight uppercase">Top Performers Leaderboard</h3>
               </div>
               {assessmentData.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                    {assessmentData.slice(0, 3).map((item, idx) => (
                      <div key={idx} className={`p-8 rounded-[2.5rem] border-2 relative overflow-hidden flex flex-col items-center text-center gap-4 transition-all hover:scale-105 ${idx === 0 ? 'bg-amber-50 border-amber-200' : idx === 1 ? 'bg-slate-50 border-slate-200' : 'bg-orange-50 border-orange-200'}`}>
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center font-black text-2xl ${idx === 0 ? 'bg-amber-500 text-white' : idx === 1 ? 'bg-slate-400 text-white' : idx === 2 ? 'bg-orange-400 text-white' : ''}`}>
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center font-semibold text-2xl ${idx === 0 ? 'bg-amber-500 text-white' : idx === 1 ? 'bg-slate-400 text-white' : idx === 2 ? 'bg-orange-400 text-white' : ''}`}>
                           {idx + 1}
                         </div>
                         <div>
-                           <p className="text-xl font-black text-slate-900">{item.loginInfo?.employeeName || 'N/A'}</p>
-                           <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{item.loginInfo?.department || 'N/A'}</p>
+                           <p className="text-xl font-semibold text-slate-900">{item.loginInfo?.employeeName || 'N/A'}</p>
+                           <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-widest">{item.loginInfo?.department || 'N/A'}</p>
                         </div>
                         <div className="space-y-1">
-                           <p className="text-4xl font-black text-slate-900">{item.totalPoints || 0}</p>
+                           <p className="text-4xl font-semibold text-slate-900">{item.totalPoints || 0}</p>
                            <p className="text-[9px] font-bold text-slate-400 uppercase">Total Excellence Pts</p>
                         </div>
                      </div>
@@ -602,14 +602,14 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                  <input 
                    placeholder="Search Directory (Name, P.No)..." 
-                   className="w-full pl-12 pr-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-bold outline-none transition-all"
+                   className="w-full pl-12 pr-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-semibold outline-none transition-all"
                    value={userSearchTerm}
                    onChange={e => setUserSearchTerm(e.target.value)}
                  />
               </div>
               <div className="bg-indigo-50 dark:bg-indigo-900/20 px-6 py-4 rounded-2xl flex items-center gap-3">
                  <Users className="w-5 h-5 text-indigo-600" />
-                 <span className="text-xs font-black uppercase text-indigo-700 tracking-widest">{filteredUsers.length} Total Users</span>
+                 <span className="text-xs font-semibold uppercase text-indigo-700 tracking-widest">{filteredUsers.length} Total Users</span>
               </div>
            </div>
 
@@ -618,13 +618,13 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Employee Name</th>
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">P.NO</th>
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Dept & Desig</th>
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Location</th>
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Access</th>
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">Data Mgmt</th>
-                      <th className="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Actions</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Employee Name</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">P.NO</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Dept & Desig</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Location</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Access</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest text-center">Data Mgmt</th>
+                      <th className="px-8 py-6 text-[10px] font-semibold uppercase text-slate-400 tracking-widest">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -636,16 +636,16 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                       <tr key={user.id} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all">
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-500">
+                              <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-semibold text-slate-500">
                                 {user.full_name?.charAt(0) || '?'}
                               </div>
-                              <p className="font-black text-slate-900 dark:text-white">{user.full_name || 'N/A'}</p>
+                              <p className="font-semibold text-slate-900 dark:text-white">{user.full_name || 'N/A'}</p>
                            </div>
                         </td>
                         <td className="px-8 py-6 font-mono font-bold text-slate-500">{user.employee_id_pno || 'N/A'}</td>
                         <td className="px-8 py-6">
-                           <p className="text-xs font-black text-slate-700 dark:text-slate-300">{user.department || 'N/A'}</p>
-                           <p className="text-[9px] font-bold text-slate-400 uppercase">{user.designation || 'N/A'}</p>
+                           <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{user.department || 'N/A'}</p>
+                           <p className="text-[9px] font-semibold text-slate-400 uppercase">{user.designation || 'N/A'}</p>
                         </td>
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-2 text-slate-500">
@@ -654,7 +654,7 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                            </div>
                         </td>
                         <td className="px-8 py-6">
-                           <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'}`}>
+                           <span className={`text-[8px] font-semibold uppercase px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'}`}>
                              {user.role || 'user'}
                            </span>
                         </td>
@@ -672,7 +672,7 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
                                  alert('No assessment data found for this user.');
                                }
                              }}
-                             className="text-[9px] font-black uppercase tracking-widest text-rose-600 hover:text-rose-800 border-2 border-rose-100 dark:border-rose-900/30 px-3 py-1 rounded-xl transition-all"
+                             className="text-[9px] font-semibold uppercase tracking-widest text-rose-600 hover:text-rose-800 border-2 border-rose-100 dark:border-rose-900/30 px-3 py-1 rounded-xl transition-all"
                            >
                              Clear Assessment
                            </button>
@@ -700,13 +700,13 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
               <div className="relative z-10 max-w-3xl space-y-6">
                  <div className="flex items-center gap-4">
                    <div className="bg-white/20 p-4 rounded-3xl"><Sparkles className="w-10 h-10" /></div>
-                   <h3 className="text-4xl font-black tracking-tight">Strategy Generator</h3>
+                   <h3 className="text-4xl font-semibold tracking-tight">Strategy Generator</h3>
                  </div>
                  <p className="text-indigo-100 text-xl font-medium">Use the Gemini reasoning engine to synthesize large-scale employee feedback into actionable leadership strategies.</p>
                  <button 
                    onClick={generateAIAnalysis} 
                    disabled={analyzing || assessmentData.length === 0}
-                   className={`px-10 py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${
+                   className={`px-10 py-5 rounded-2xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
                      (analyzing || assessmentData.length === 0) ? 'bg-white/20 text-white/50 cursor-not-allowed' : 'bg-white text-indigo-900 hover:bg-indigo-50 shadow-xl'
                    }`}
                  >
@@ -728,36 +728,36 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
            <div className="bg-white dark:bg-slate-900 p-10 rounded-[3.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
               <div className="flex items-center gap-4">
                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600"><Lock className="w-6 h-6" /></div>
-                 <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Credentials</h3>
+                 <h3 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase tracking-tight">Credentials</h3>
               </div>
               <form onSubmit={handlePasswordChange} className="space-y-6">
                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Current Key</label>
-                    <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.current} onChange={e => setPassForm(p => ({...p, current: e.target.value}))} />
+                    <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1">Current Key</label>
+                    <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-semibold" value={passForm.current} onChange={e => setPassForm(p => ({...p, current: e.target.value}))} />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">New Key</label>
-                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.new} onChange={e => setPassForm(p => ({...p, new: e.target.value}))} />
+                       <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1">New Key</label>
+                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-semibold" value={passForm.new} onChange={e => setPassForm(p => ({...p, new: e.target.value}))} />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Confirm</label>
-                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-black" value={passForm.confirm} onChange={e => setPassForm(p => ({...p, confirm: e.target.value}))} />
+                       <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1">Confirm</label>
+                       <input type="password" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 dark:text-white font-semibold" value={passForm.confirm} onChange={e => setPassForm(p => ({...p, confirm: e.target.value}))} />
                     </div>
                  </div>
-                 {passStatus && <p className={`text-[11px] font-black uppercase ${passStatus.type === 'error' ? 'text-rose-600' : 'text-emerald-600'}`}>{passStatus.msg}</p>}
-                 <button type="submit" className="w-full py-5 bg-slate-900 dark:bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-800 transition-all shadow-xl">Update Access</button>
+                 {passStatus && <p className={`text-[11px] font-semibold uppercase ${passStatus.type === 'error' ? 'text-rose-600' : 'text-emerald-600'}`}>{passStatus.msg}</p>}
+                 <button type="submit" className="w-full py-5 bg-slate-900 dark:bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-slate-800 transition-all shadow-xl">Update Access</button>
               </form>
            </div>
            
            <div className="bg-white dark:bg-slate-900 p-10 rounded-[3.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
               <div className="flex items-center gap-4">
                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-2xl text-amber-600"><AlertTriangle className="w-6 h-6" /></div>
-                 <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Danger Zone</h3>
+                 <h3 className="text-2xl font-semibold text-slate-900 dark:text-white uppercase tracking-tight">Danger Zone</h3>
               </div>
               <div className="p-6 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 rounded-3xl space-y-4">
                  <p className="text-xs font-bold text-rose-800 dark:text-rose-400">Warning: The following action will permanently purge all employee data and assessments. This cannot be undone.</p>
-                 <button onClick={() => setWipeAllConfirm(true)} className="w-full py-4 bg-rose-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-rose-700 transition-all flex items-center justify-center gap-2">
+                 <button onClick={() => setWipeAllConfirm(true)} className="w-full py-4 bg-rose-600 text-white rounded-2xl font-semibold uppercase text-[10px] tracking-widest hover:bg-rose-700 transition-all flex items-center justify-center gap-2">
                    <Fingerprint className="w-4 h-4" /> Execute System Wipe
                  </button>
               </div>
@@ -774,11 +774,11 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 backdrop-blur-md bg-slate-950/40">
            <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] shadow-2xl max-w-sm w-full text-center space-y-6">
               <div className="bg-rose-50 dark:bg-rose-950/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-rose-600"><AlertCircle className="w-10 h-10" /></div>
-              <h4 className="text-2xl font-black text-slate-900 dark:text-white">Purge Record?</h4>
+              <h4 className="text-2xl font-semibold text-slate-900 dark:text-white">Purge Record?</h4>
               <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Are you sure you want to permanently delete this worker assessment?</p>
               <div className="flex gap-4">
-                 <button onClick={() => setDeleteConfirmId(null)} className="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-[10px]">Cancel</button>
-                 <button onClick={() => handleDelete(deleteConfirmId)} className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-black uppercase text-[10px]">Delete</button>
+                 <button onClick={() => setDeleteConfirmId(null)} className="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold uppercase text-[10px]">Cancel</button>
+                 <button onClick={() => handleDelete(deleteConfirmId)} className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-semibold uppercase text-[10px]">Delete</button>
               </div>
            </div>
         </div>
@@ -788,11 +788,11 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 backdrop-blur-md bg-slate-950/40">
            <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] shadow-2xl max-w-sm w-full text-center space-y-6">
               <div className="bg-rose-50 dark:bg-rose-950/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-rose-600"><UserMinus className="w-10 h-10" /></div>
-              <h4 className="text-2xl font-black text-slate-900 dark:text-white">Delete User?</h4>
+              <h4 className="text-2xl font-semibold text-slate-900 dark:text-white">Delete User?</h4>
               <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Deleting this user will also erase all their associated assessment records.</p>
               <div className="flex gap-4">
-                 <button onClick={() => setUserDeleteConfirmId(null)} className="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-[10px]">Cancel</button>
-                 <button onClick={() => handleUserDelete(userDeleteConfirmId)} className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-black uppercase text-[10px]">Delete User</button>
+                 <button onClick={() => setUserDeleteConfirmId(null)} className="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold uppercase text-[10px]">Cancel</button>
+                 <button onClick={() => handleUserDelete(userDeleteConfirmId)} className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-semibold uppercase text-[10px]">Delete User</button>
               </div>
            </div>
         </div>
@@ -803,13 +803,13 @@ export default function AdminDashboard({ onBack, currentUser }: Props) {
            <div className="bg-white dark:bg-slate-900 p-12 rounded-[4rem] shadow-2xl max-w-lg w-full text-center space-y-8 animate-in zoom-in-95">
               <div className="bg-rose-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto text-white shadow-2xl shadow-rose-500/50"><ShieldAlert className="w-14 h-14" /></div>
               <div className="space-y-2">
-                <h4 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Nuclear Reset</h4>
-                <p className="text-rose-600 dark:text-rose-400 font-black uppercase text-[10px] tracking-[0.3em]">Authorized Personnel Only</p>
+                <h4 className="text-4xl font-semibold text-slate-900 dark:text-white uppercase tracking-tighter">Nuclear Reset</h4>
+                <p className="text-rose-600 dark:text-rose-400 font-semibold uppercase text-[10px] tracking-[0.3em]">Authorized Personnel Only</p>
               </div>
               <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">This operation will wipe all employee records and survey results from the ITC Cloud Database. This action is irreversible.</p>
               <div className="flex flex-col gap-3">
-                 <button onClick={handleWipeAll} className="w-full py-5 rounded-2xl bg-rose-600 text-white font-black uppercase text-xs tracking-widest shadow-xl shadow-rose-500/20">Purge Registry Now</button>
-                 <button onClick={() => setWipeAllConfirm(false)} className="w-full py-5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-xs tracking-widest">Abort Mission</button>
+                 <button onClick={handleWipeAll} className="w-full py-5 rounded-2xl bg-rose-600 text-white font-semibold uppercase text-xs tracking-widest shadow-xl shadow-rose-500/20">Purge Registry Now</button>
+                 <button onClick={() => setWipeAllConfirm(false)} className="w-full py-5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold uppercase text-xs tracking-widest">Abort Mission</button>
               </div>
            </div>
         </div>

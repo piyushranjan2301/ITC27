@@ -56,7 +56,7 @@ const BehavioralScreen: React.FC<Props> = ({ language, questions, onComplete, gl
   return (
     <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="space-y-2">
-        <div className="flex justify-between text-[11px] font-black text-indigo-900 dark:text-indigo-400 uppercase tracking-widest transition-all">
+        <div className="flex justify-between text-[11px] font-semibold text-indigo-900 dark:text-indigo-400 uppercase tracking-widest transition-all">
           <span className="flex items-center gap-2">
             <Target className="w-4 h-4" />
             {language === 'hi' ? 'चरण 2: व्यवहार' : 'PHASE 2: BEHAVIOR'}
@@ -80,10 +80,10 @@ const BehavioralScreen: React.FC<Props> = ({ language, questions, onComplete, gl
       <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-[3.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 transition-all">
         <div className="space-y-10">
           <div className="space-y-4">
-            <p className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1 rounded-full inline-block transition-all">
+            <p className="text-[10px] font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1 rounded-full inline-block transition-all">
               {language === 'hi' ? 'प्राकृतिक शैली चुनें' : 'Choose your natural style'}
             </p>
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-white leading-snug transition-all">
+            <h3 className="text-2xl font-semibold text-slate-800 dark:text-white leading-snug transition-all">
               {language === 'hi' ? currentQuestion.scenarioHi : currentQuestion.scenarioEn}
             </h3>
           </div>
@@ -103,12 +103,12 @@ const BehavioralScreen: React.FC<Props> = ({ language, questions, onComplete, gl
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <span className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg font-black text-xs ${
+                    <span className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg font-semibold text-xs ${
                       active ? 'bg-white text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 group-hover:text-indigo-600'
                     }`}>
                       {key}
                     </span>
-                    <p className={`text-md font-bold ${active ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+                    <p className={`text-md font-semibold ${active ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
                       {language === 'hi' ? option.textHi : option.textEn}
                     </p>
                   </div>
@@ -122,7 +122,7 @@ const BehavioralScreen: React.FC<Props> = ({ language, questions, onComplete, gl
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`px-6 py-3 font-bold transition-all ${
+            className={`px-6 py-3 font-semibold transition-all ${
               currentIndex === 0 ? 'opacity-0' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -132,7 +132,7 @@ const BehavioralScreen: React.FC<Props> = ({ language, questions, onComplete, gl
           <button
             onClick={handleNext}
             disabled={!isSelected}
-            className={`flex items-center gap-2 px-10 py-4 rounded-2xl font-black transition-all shadow-lg ${
+            className={`flex items-center gap-2 px-10 py-4 rounded-2xl font-semibold transition-all shadow-lg ${
               isSelected 
               ? 'bg-indigo-900 dark:bg-indigo-700 text-white hover:bg-indigo-800 dark:hover:bg-indigo-600' 
               : 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600'

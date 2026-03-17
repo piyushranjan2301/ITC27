@@ -38,6 +38,11 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
           message: 'Security Key Mismatch',
           hint: `The key entered for P.NO "${inputPNo}" is incorrect. Keys are case-sensitive. If you have forgotten your key, use the "Forgot?" link above to perform a master reset.`
         };
+      case 'ACCOUNT_LOCKED':
+        return {
+          message: 'Account Locked',
+          hint: `This account (P.NO "${inputPNo}") has already submitted the assessment. Per our Single Attempt Policy, access is restricted after submission.`
+        };
       case 'CONNECTION_FAILED':
         return {
           message: 'Secure Server Unreachable',
@@ -65,6 +70,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
     switch (code) {
       case 'USER_NOT_FOUND': return <UserX className="w-5 h-5" />;
       case 'INCORRECT_KEY': return <Lock className="w-5 h-5" />;
+      case 'ACCOUNT_LOCKED': return <Shield className="w-5 h-5" />;
       case 'CONNECTION_FAILED': return <WifiOff className="w-5 h-5" />;
       default: return <AlertCircle className="w-5 h-5" />;
     }
@@ -138,13 +144,13 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
               <div className="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-100">
                 <RefreshCw className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Identity Recovery</h2>
-              <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">Master Security Reset</p>
+              <h2 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tighter">Identity Recovery</h2>
+              <p className="text-slate-400 font-semibold uppercase text-[10px] tracking-[0.3em]">Master Security Reset</p>
            </div>
 
            {error && (
              <div className="p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-800 dark:text-rose-400 flex flex-col gap-1 animate-in slide-in-from-top-2">
-               <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest">
+               <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-widest">
                  <div className="shrink-0">{getErrorIcon(error.code)}</div>
                  <span>{error.message}</span>
                </div>
@@ -153,7 +159,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
            )}
 
            {successMsg && (
-             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-black uppercase tracking-widest flex items-center gap-3">
+             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-semibold uppercase tracking-widest flex items-center gap-3">
                <CheckCircle2 className="w-4 h-4 shrink-0" />
                {successMsg}
              </div>
@@ -161,10 +167,10 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
 
            <form onSubmit={handleRecovery} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Employee P.NO</label>
+                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1">Employee P.NO</label>
                 <input 
                   required
-                  className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-indigo-600 outline-none transition-all font-black text-slate-900 dark:text-white"
+                  className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-indigo-600 outline-none transition-all font-semibold text-slate-900 dark:text-white"
                   placeholder="Ex: 12345"
                   value={recoveryPNo}
                   onChange={(e) => setRecoveryPNo(e.target.value)}
@@ -172,10 +178,10 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Master Recovery Code</label>
+                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1">Master Recovery Code</label>
                 <input 
                   required
-                  className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-indigo-600 outline-none transition-all font-black text-slate-900 dark:text-white"
+                  className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-indigo-600 outline-none transition-all font-semibold text-slate-900 dark:text-white"
                   placeholder="Secret recovery token"
                   value={recoveryCode}
                   onChange={(e) => setRecoveryCode(e.target.value)}
@@ -183,11 +189,11 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">New Security Key</label>
+                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-1">New Security Key</label>
                 <input 
                   required
                   type="password"
-                  className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-indigo-600 outline-none transition-all font-black text-slate-900 dark:text-white"
+                  className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-indigo-600 outline-none transition-all font-semibold text-slate-900 dark:text-white"
                   placeholder="Minimum 6 characters"
                   value={newKey}
                   onChange={(e) => setNewKey(e.target.value)}
@@ -197,7 +203,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black uppercase text-sm tracking-widest shadow-xl hover:bg-slate-900 dark:hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-semibold uppercase text-sm tracking-widest shadow-xl hover:bg-slate-900 dark:hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Reset Security Key'}
               </button>
@@ -205,7 +211,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
 
            <button 
              onClick={() => setMode('login')}
-             className="w-full text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center justify-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"
+             className="w-full text-[10px] font-semibold text-slate-400 uppercase tracking-[0.3em] flex items-center justify-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors"
            >
              <ArrowLeft className="w-3.5 h-3.5" /> Back to Login
            </button>
@@ -232,10 +238,10 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
             <ITCLogo className="w-16 h-16 drop-shadow-sm" variant="color" />
           </div>
           <div className="space-y-3">
-            <h2 className="text-6xl font-black bg-clip-text text-transparent bg-gradient-to-b from-slate-900 to-slate-700 dark:from-white dark:to-slate-400 tracking-tighter leading-none pb-1">
+            <h2 className="text-6xl font-semibold bg-clip-text text-transparent bg-gradient-to-b from-slate-900 to-slate-700 dark:from-white dark:to-slate-400 tracking-tighter leading-none pb-1">
               Login Portal
             </h2>
-            <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.6em] pl-1 opacity-80">
+            <p className="text-slate-400 font-semibold uppercase text-[10px] tracking-[0.6em] pl-1 opacity-80">
               Integrated Systems
             </p>
           </div>
@@ -243,24 +249,24 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
 
         {error && (
           <div className="p-5 rounded-[1.5rem] bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-800 dark:text-rose-400 flex flex-col gap-1 transition-colors uppercase tracking-widest animate-in slide-in-from-top-2">
-            <div className="flex items-center gap-3 text-[10px] font-black">
+            <div className="flex items-center gap-3 text-[10px] font-semibold">
               <div className="shrink-0">{getErrorIcon(error.code)}</div>
               <span>{error.message}</span>
             </div>
-            {error.hint && <p className="text-[9px] font-bold opacity-70 pl-8 leading-tight lowercase first-letter:uppercase italic">{error.hint}</p>}
+            {error.hint && <p className="text-[9px] font-medium opacity-70 pl-8 leading-tight lowercase first-letter:uppercase italic">{error.hint}</p>}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="space-y-8 relative z-10">
           <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+            <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
               <Hash className="w-3.5 h-3.5 text-blue-900 dark:text-blue-400 flex-shrink-0" /> 
               <span>Employee P.NO</span>
             </label>
             <input 
               required
               autoComplete="username"
-              className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:focus:border-blue-500 outline-none transition-all font-black text-slate-900 dark:text-white placeholder:font-normal placeholder:text-slate-300 dark:placeholder:text-slate-500 shadow-sm"
+              className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:focus:border-blue-500 outline-none transition-all font-semibold text-slate-900 dark:text-white placeholder:font-normal placeholder:text-slate-300 dark:placeholder:text-slate-500 shadow-sm"
               placeholder="Ex: 12345"
               value={pNo}
               onChange={(e) => setPNo(e.target.value)}
@@ -269,14 +275,14 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
 
           <div className="space-y-3">
             <div className="flex justify-between items-center px-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <Key className="w-3.5 h-3.5 text-blue-900 dark:text-blue-400 flex-shrink-0" /> 
                 <span>Security Key</span>
               </label>
               <button 
                 type="button" 
                 onClick={() => setMode('forgot')}
-                className="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest hover:underline"
+                className="text-[9px] font-semibold text-blue-900 dark:text-blue-400 uppercase tracking-widest hover:underline"
               >
                 Forgot?
               </button>
@@ -285,7 +291,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
               required
               type="password"
               autoComplete="current-password"
-              className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:focus:border-blue-500 outline-none transition-all font-black text-slate-900 dark:text-white placeholder:font-normal placeholder:text-slate-300 dark:placeholder:text-slate-500 tracking-widest shadow-sm"
+              className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-blue-900 dark:focus:border-blue-500 outline-none transition-all font-semibold text-slate-900 dark:text-white placeholder:font-normal placeholder:text-slate-300 dark:placeholder:text-slate-500 tracking-widest shadow-sm"
               placeholder="••••••••"
               value={securityKey}
               onChange={(e) => setSecurityKey(e.target.value)}
@@ -295,7 +301,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-6 rounded-[2.5rem] font-black text-lg transition-all shadow-2xl flex items-center justify-center gap-4 transform active:scale-[0.98] ${
+            className={`w-full py-6 rounded-[2.5rem] font-semibold text-lg transition-all shadow-2xl flex items-center justify-center gap-4 transform active:scale-[0.98] ${
               loading 
                 ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed' 
                 : 'bg-blue-900 text-white hover:bg-slate-900 dark:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-blue-200 dark:hover:shadow-none'
@@ -316,7 +322,7 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
           <button 
             type="button"
             onClick={() => setMode('register')}
-            className="group relative inline-flex items-center justify-center px-8 py-4 font-black text-[11px] uppercase tracking-[0.2em] text-blue-900 dark:text-blue-400 transition-all duration-300 ease-in-out hover:text-blue-700 dark:hover:text-blue-300"
+            className="group relative inline-flex items-center justify-center px-8 py-4 font-semibold text-[11px] uppercase tracking-[0.2em] text-blue-900 dark:text-blue-400 transition-all duration-300 ease-in-out hover:text-blue-700 dark:hover:text-blue-300"
           >
             <span className="absolute inset-0 w-full h-full rounded-full bg-blue-50 dark:bg-blue-900/20 transition-all duration-300 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30"></span>
             <span className="relative">New Enrollment? Register</span>

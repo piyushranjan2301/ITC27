@@ -43,7 +43,7 @@ const ITCLogo: React.FC<Props> = ({ className = "w-12 h-12", variant = 'color' }
           textAnchor="middle" 
           style={{ 
             fontSize: '68px', 
-            fontWeight: 900, 
+            fontWeight: 600, 
             fontFamily: 'system-ui, -apple-system, sans-serif',
             fontStyle: 'italic',
             letterSpacing: '-0.02em'

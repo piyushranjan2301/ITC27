@@ -97,7 +97,7 @@ const SJTScreen: React.FC<Props> = ({ language, questions, onComplete, globalOff
     <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div className="space-y-2 flex-1">
-          <div className="flex justify-between items-center text-[10px] font-black text-amber-900 dark:text-amber-400 uppercase tracking-widest transition-colors">
+          <div className="flex justify-between items-center text-[10px] font-semibold text-amber-900 dark:text-amber-400 uppercase tracking-widest transition-colors">
             <span className="flex items-center gap-2">
               <BrainCircuit className="w-4 h-4 text-amber-600" />
               {language === 'hi' ? 'चरण 3: सिमुलेशन' : 'PHASE 3: 15-STEP SIMULATION'}
@@ -128,12 +128,12 @@ const SJTScreen: React.FC<Props> = ({ language, questions, onComplete, globalOff
         
         <div className="space-y-10">
           <div className={`${currentComplexity === 'Advanced' ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-100 dark:border-indigo-900/30' : 'bg-amber-50/50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30'} p-8 rounded-[2.5rem] border-2 relative transition-all duration-500`}>
-            <div className={`absolute -top-4 left-10 px-4 py-1.5 text-white text-[10px] font-black uppercase rounded-xl shadow-lg transform -rotate-1 transition-colors ${
+            <div className={`absolute -top-4 left-10 px-4 py-1.5 text-white text-[10px] font-semibold uppercase rounded-xl shadow-lg transform -rotate-1 transition-colors ${
               currentComplexity === 'Advanced' ? 'bg-indigo-600' : 'bg-amber-500'
             }`}>
               {currentComplexity === 'Advanced' ? 'Strategic Insight' : 'Operational Focus'}
             </div>
-            <h3 className={`text-2xl font-black leading-snug italic tracking-tight transition-colors ${
+            <h3 className={`text-2xl font-semibold leading-snug italic tracking-tight transition-colors ${
               currentComplexity === 'Advanced' ? 'text-indigo-950 dark:text-indigo-200' : 'text-amber-950 dark:text-amber-200'
             }`}>
               "{language === 'hi' ? currentQuestion.scenarioHi : currentQuestion.scenarioEn}"
@@ -154,12 +154,12 @@ const SJTScreen: React.FC<Props> = ({ language, questions, onComplete, globalOff
                     : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-xl text-xs font-black transition-all ${
+                  <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-xl text-xs font-semibold transition-all ${
                     active ? 'bg-white text-slate-900' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                   }`}>
                     {key}
                   </span>
-                  <p className={`font-bold text-[15px] leading-tight flex-1 ${active ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+                  <p className={`font-semibold text-[15px] leading-tight flex-1 ${active ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
                     {language === 'hi' ? option.textHi : option.textEn}
                   </p>
                 </button>
@@ -172,7 +172,7 @@ const SJTScreen: React.FC<Props> = ({ language, questions, onComplete, globalOff
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all ${
+            className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-[11px] uppercase tracking-[0.2em] transition-all ${
               currentIndex === 0 ? 'opacity-0 cursor-default' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
@@ -183,7 +183,7 @@ const SJTScreen: React.FC<Props> = ({ language, questions, onComplete, globalOff
           <button
             onClick={handleNext}
             disabled={!isSelected}
-            className={`flex items-center gap-4 px-14 py-5 rounded-[2.5rem] font-black text-[13px] uppercase tracking-[0.25em] transition-all shadow-2xl ${
+            className={`flex items-center gap-4 px-14 py-5 rounded-[2.5rem] font-semibold text-[13px] uppercase tracking-[0.25em] transition-all shadow-2xl ${
               isSelected 
               ? (currentComplexity === 'Advanced' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-amber-600 hover:bg-amber-500') + ' text-white transform active:scale-95' 
               : 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-700'
