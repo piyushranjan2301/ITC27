@@ -28,8 +28,12 @@ const App: React.FC = () => {
   const [globalQuestionOffset, setGlobalQuestionOffset] = useState(0);
   const [assessmentStartTime, setAssessmentStartTime] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('itc_theme');
-    return saved === 'dark';
+    try {
+      const saved = localStorage.getItem('itc_theme');
+      return saved === 'dark';
+    } catch (e) {
+      return false;
+    }
   });
 
   const [state, setState] = useState<AssessmentState>({
@@ -50,7 +54,9 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('itc_theme', isDarkMode ? 'dark' : 'light');
+    try {
+      localStorage.setItem('itc_theme', isDarkMode ? 'dark' : 'light');
+    } catch (e) {}
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {

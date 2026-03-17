@@ -8,7 +8,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+let DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+
+// Sanitize DATABASE_URL if it's prefixed with 'psql' or contains quotes
+if (DATABASE_URL.startsWith('psql ')) {
+  DATABASE_URL = DATABASE_URL.replace(/^psql\s+['"]?|['"]?$/g, '');
+}
+// Also handle cases where it might just be wrapped in quotes
+DATABASE_URL = DATABASE_URL.replace(/^['"]|['"]$/g, '');
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
@@ -20,13 +27,12 @@ process.on('uncaughtException', (err) => {
 
 async function startServer() {
   console.log('--- SERVER STARTUP SEQUENCE START ---');
-  console.log('Node Version:', process.version);
-  console.log('Environment:', process.env.NODE_ENV);
   
-  const sql = neon(DATABASE_URL);
   const app = express();
   const PORT = 3000;
 
+  const sql = neon(DATABASE_URL);
+  
   console.log('Configuring middleware...');
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -43,7 +49,13 @@ async function startServer() {
     if (isDbInitialized) return;
     try {
       console.log('Initializing database...');
-      await sql`SELECT 1`;
+      // Set a timeout for the initial connection check
+      const connectionPromise = sql`SELECT 1`;
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database connection timed out')), 10000)
+      );
+      
+      await Promise.race([connectionPromise, timeoutPromise]);
       console.log('Database connection verified.');
       await sql`
         CREATE TABLE IF NOT EXISTS itc_users (
@@ -102,6 +114,16 @@ async function startServer() {
         `;
         console.log('Default admin user created.');
       }
+
+      const testUserExists = await sql`SELECT id FROM itc_users WHERE employee_id_pno = '55' LIMIT 1`;
+      if (testUserExists.length === 0) {
+        console.log('Creating default test user 55...');
+        await sql`
+          INSERT INTO itc_users (username, password, role, full_name, employee_id_pno, department, designation, phone_number, location, recovery_code)
+          VALUES ('55', '5555', 'worker', 'Test User 55', '55', 'PMD', 'Operator', '9876543210', 'Munger', 'RECOVERY-55')
+        `;
+        console.log('Default test user 55 created.');
+      }
       isDbInitialized = true;
       console.log('Database initialized successfully.');
     } catch (error) {
@@ -110,16 +132,19 @@ async function startServer() {
     }
   }
 
-  // Pre-initialize database
-  try {
-    await initDatabase();
-  } catch (dbError) {
-    console.error('FAILED TO INITIALIZE DATABASE ON STARTUP. Server will still start but API may fail.');
-  }
+  // Initialize database in the background - don't block server startup
+  initDatabase().catch(err => {
+    console.error('Initial database initialization failed:', err);
+  });
 
   // API Routes
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
+    res.json({ 
+      status: 'ok', 
+      time: new Date().toISOString(),
+      env: process.env.NODE_ENV,
+      cwd: process.cwd()
+    });
   });
 
   app.get('/api/db/test', async (req, res) => {
@@ -349,32 +374,43 @@ async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     try {
-      console.log('Initializing Vite middleware (with 30s timeout)...');
-      const vitePromise = createViteServer({
+      console.log('Initializing Vite middleware...');
+      const vite = await createViteServer({
         server: { middlewareMode: true },
         appType: 'spa',
       });
       
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Vite initialization timed out')), 30000)
-      );
-
-      const vite = await Promise.race([vitePromise, timeoutPromise]) as any;
       app.use(vite.middlewares);
       
+      // SPA Fallback for development
       app.get('*', async (req, res, next) => {
-        if (req.path.startsWith('/api')) return next();
+        const isApi = req.path.startsWith('/api');
+        const hasExtension = path.extname(req.path) !== '';
+        
+        if (isApi || (hasExtension && req.path !== '/')) {
+          return next();
+        }
+        
+        console.log(`[SPA Fallback] Serving index.html for: ${req.url}`);
+        
         try {
           const fs = await import('fs');
-          let template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+          const indexPath = path.resolve(process.cwd(), 'index.html');
+          
+          if (!fs.existsSync(indexPath)) {
+            console.error(`[SPA Fallback] ERROR: index.html not found at ${indexPath}`);
+            return res.status(500).send('Internal Server Error: index.html missing');
+          }
+          
+          let template = fs.readFileSync(indexPath, 'utf-8');
           template = await vite.transformIndexHtml(req.url, template);
           res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
         } catch (e) {
-          console.error('Vite HTML Transform Error:', e);
-          next(e);
+          console.error('[SPA Fallback] Vite Transform Error:', e);
+          res.status(500).send(`Vite Transform Error: ${e instanceof Error ? e.message : String(e)}`);
         }
       });
-
+      
       console.log('Vite middleware initialized successfully.');
     } catch (viteError) {
       console.error('CRITICAL: Failed to initialize Vite middleware:', viteError);

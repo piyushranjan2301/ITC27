@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { LogIn, Key, Hash, Loader2, Shield, Factory, ArrowLeft, RefreshCw, AlertCircle, CheckCircle2, UserX, Lock, WifiOff } from 'lucide-react';
-import { loginUser, resetUserPasswordWithRecovery } from '../db';
+import { loginUser, resetUserPasswordWithRecovery, testDatabaseConnection } from '../db';
 import RegisterScreen from './RegisterScreen';
 import ITCLogo from './ITCLogo';
 
@@ -25,12 +25,6 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
   const [recoveryPNo, setRecoveryPNo] = useState('');
   const [recoveryCode, setRecoveryCode] = useState('');
   const [newKey, setNewKey] = useState('');
-
-  const [dbStatus, setDbStatus] = useState<{ success: boolean; error?: string } | null>(null);
-
-  React.useEffect(() => {
-    testDatabaseConnection().then(setDbStatus);
-  }, []);
 
   const getFriendlyErrorMessage = (code: string, inputPNo?: string) => {
     switch (code) {
@@ -234,12 +228,16 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-bl-full -mr-16 -mt-16 opacity-40 pointer-events-none" />
         
         <div className="text-center space-y-4 relative z-10">
-          <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-100 dark:shadow-none transform hover:scale-110 transition-transform">
-            <ITCLogo className="w-16 h-16" variant="color" />
+          <div className="w-24 h-24 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-100/50 dark:shadow-none transform hover:scale-105 transition-all duration-500 border border-white/50 dark:border-white/5">
+            <ITCLogo className="w-16 h-16 drop-shadow-sm" variant="color" />
           </div>
-          <div className="space-y-1">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">Login Portal</h2>
-            <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.4em]">ITC Integrated Systems</p>
+          <div className="space-y-3">
+            <h2 className="text-6xl font-black bg-clip-text text-transparent bg-gradient-to-b from-slate-900 to-slate-700 dark:from-white dark:to-slate-400 tracking-tighter leading-none pb-1">
+              Login Portal
+            </h2>
+            <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.6em] pl-1 opacity-80">
+              Integrated Systems
+            </p>
           </div>
         </div>
 
@@ -314,20 +312,14 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
           </button>
         </form>
 
-        <div className="text-center pt-8 border-t border-slate-50 dark:border-slate-800 relative z-10 space-y-4">
-          <div className="flex items-center justify-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${dbStatus?.success ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse'}`} />
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-              {dbStatus === null ? 'Checking ITC Vault Connection...' : dbStatus.success ? 'ITC Vault Securely Connected' : `Connection Error: ${dbStatus.error}`}
-            </span>
-          </div>
-
+        <div className="text-center pt-10 border-t border-slate-100 dark:border-slate-800 relative z-10">
           <button 
             type="button"
             onClick={() => setMode('register')}
-            className="text-[10px] font-black text-blue-900 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors uppercase tracking-[0.3em] bg-blue-50 dark:bg-blue-900/10 px-6 py-3 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/20"
+            className="group relative inline-flex items-center justify-center px-8 py-4 font-black text-[11px] uppercase tracking-[0.2em] text-blue-900 dark:text-blue-400 transition-all duration-300 ease-in-out hover:text-blue-700 dark:hover:text-blue-300"
           >
-            New Enrollment Required? Register
+            <span className="absolute inset-0 w-full h-full rounded-full bg-blue-50 dark:bg-blue-900/20 transition-all duration-300 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30"></span>
+            <span className="relative">New Enrollment? Register</span>
           </button>
         </div>
       </div>
