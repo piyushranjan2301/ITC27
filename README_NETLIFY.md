@@ -20,13 +20,17 @@ This application is now configured for deployment on Netlify.
 
 4. **Set Environment Variables**:
    In Netlify, go to **Site settings** > **Environment variables** and add:
-   - `DATABASE_URL`: Your Neon PostgreSQL connection string.
    - `GEMINI_API_KEY`: Your Google Gemini API key.
+   - `NODE_ENV`: Set to `production`.
+   - `DATABASE_URL`: (Optional) Your Neon PostgreSQL connection string. If not provided, a default one is used.
 
-5. **Deploy**:
-   Click **"Deploy site"**.
+5. **CORS and Access Denied Fixes**:
+   - Added `cors` middleware with explicit options.
+   - Refactored `app.ts` to use an Express Router for more robust path handling.
+   - Updated `netlify.toml` redirects to ensure API requests are correctly routed to the serverless function.
+   - Added logging to the backend to help troubleshoot any remaining issues.
 
 ## How it Works
 - **Frontend**: The React app is built using Vite into the `dist` folder.
-- **Backend**: The Express server is wrapped in a Netlify Function located at `netlify/functions/api.ts`.
+- **Backend**: The Express server is wrapped in a Netlify Function located at `netlify/functions/server.ts`.
 - **Routing**: `netlify.toml` redirects all `/api/*` requests to the serverless function.

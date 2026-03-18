@@ -1,15 +1,19 @@
 
 import express from 'express';
+import cors from 'cors';
 import { neon } from '@neondatabase/serverless';
 
 const app = express();
-
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
-
-const sql = neon(DATABASE_URL.replace(/^psql\s+/, '').replace(/^['"]|['"]$/g, ''));
-
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eof70OsTYIFZ@ep-floral-darkness-aeaknj5y-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+const sql = neon(DATABASE_URL.replace(/^psql\s+/, '').replace(/^['"]|['"]$/g, ''));
 
 let isDbInitialized = false;
 async function initDatabase() {
@@ -34,7 +38,6 @@ async function initDatabase() {
       );
     `;
     
-    // Migration: Add is_locked column if it doesn't exist (for existing tables)
     try {
       await sql`ALTER TABLE itc_users ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE`;
     } catch (e) {
@@ -89,23 +92,29 @@ async function initDatabase() {
   }
 }
 
+const apiRouter = express.Router();
+
 // Middleware to ensure DB is initialized
-app.use(async (req, res, next) => {
-  if (req.path.startsWith('/api/db')) {
-    await initDatabase();
+apiRouter.use(async (req, res, next) => {
+  if (req.path.startsWith('/db')) {
+    try {
+      await initDatabase();
+    } catch (e) {
+      console.error('Failed to init DB in middleware:', e);
+    }
   }
   next();
 });
 
-app.get('/api/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-app.get('/api-ping', (req, res) => {
-  res.json({ success: true, timestamp: new Date().toISOString() });
+apiRouter.get('/ping', (req, res) => {
+  res.json({ success: true, timestamp: new Date().toISOString(), env: process.env.NODE_ENV });
 });
 
-app.get('/api/db/test', async (req, res) => {
+apiRouter.get('/db/test', async (req, res) => {
   try {
     await sql`SELECT 1`;
     res.json({ success: true });
@@ -114,7 +123,7 @@ app.get('/api/db/test', async (req, res) => {
   }
 });
 
-app.post('/api/db/register', async (req, res) => {
+apiRouter.post('/db/register', async (req, res) => {
   const { user } = req.body;
   try {
     const checkPno = await sql`SELECT id FROM itc_users WHERE employee_id_pno = ${user.pNo} LIMIT 1`;
@@ -130,7 +139,7 @@ app.post('/api/db/register', async (req, res) => {
   }
 });
 
-app.post('/api/db/login', async (req, res) => {
+apiRouter.post('/db/login', async (req, res) => {
   const { pNo, securityKey } = req.body;
   try {
     const user = await sql`SELECT * FROM itc_users WHERE employee_id_pno = ${pNo} LIMIT 1`;
@@ -143,7 +152,7 @@ app.post('/api/db/login', async (req, res) => {
   }
 });
 
-app.post('/api/db/save-result', async (req, res) => {
+apiRouter.post('/db/save-result', async (req, res) => {
   const { result } = req.body;
   try {
     await sql`
@@ -167,7 +176,6 @@ app.post('/api/db/save-result', async (req, res) => {
       )
     `;
     
-    // Lock the user account after submission (except for admins)
     if (result.loginInfo?.pNo && result.loginInfo?.role !== 'admin') {
       await sql`UPDATE itc_users SET is_locked = TRUE WHERE employee_id_pno = ${result.loginInfo.pNo}`;
     }
@@ -178,7 +186,7 @@ app.post('/api/db/save-result', async (req, res) => {
   }
 });
 
-app.get('/api/db/results', async (req, res) => {
+apiRouter.get('/db/results', async (req, res) => {
   try {
     const results = await sql`SELECT * FROM itc_assessment_results ORDER BY total_points DESC, created_at DESC`;
     res.json(results);
@@ -187,7 +195,7 @@ app.get('/api/db/results', async (req, res) => {
   }
 });
 
-app.get('/api/db/result/:pNo', async (req, res) => {
+apiRouter.get('/db/result/:pNo', async (req, res) => {
   const { pNo } = req.params;
   try {
     const result = await sql`SELECT * FROM itc_assessment_results WHERE employee_id_pno = ${pNo} LIMIT 1`;
@@ -197,7 +205,7 @@ app.get('/api/db/result/:pNo', async (req, res) => {
   }
 });
 
-app.delete('/api/db/result/:id', async (req, res) => {
+apiRouter.delete('/db/result/:id', async (req, res) => {
   const { id } = req.params;
   try {
     await sql`DELETE FROM itc_assessment_results WHERE id = ${id}`;
@@ -207,7 +215,7 @@ app.delete('/api/db/result/:id', async (req, res) => {
   }
 });
 
-app.get('/api/db/users', async (req, res) => {
+apiRouter.get('/db/users', async (req, res) => {
   try {
     const users = await sql`SELECT id, role, full_name, employee_id_pno, department, designation, phone_number, location, created_at FROM itc_users ORDER BY created_at DESC`;
     res.json(users);
@@ -216,7 +224,7 @@ app.get('/api/db/users', async (req, res) => {
   }
 });
 
-app.delete('/api/db/user/:id', async (req, res) => {
+apiRouter.delete('/db/user/:id', async (req, res) => {
   const { id } = req.params;
   try {
     await sql`DELETE FROM itc_users WHERE id = ${id}`;
@@ -226,11 +234,9 @@ app.delete('/api/db/user/:id', async (req, res) => {
   }
 });
 
-app.post('/api/db/wipe', async (req, res) => {
+apiRouter.post('/db/wipe', async (req, res) => {
   try {
     await sql`DELETE FROM itc_assessment_results`;
-    // We don't wipe users to avoid locking ourselves out, or maybe just non-admins?
-    // Usually wipe means everything.
     await sql`DELETE FROM itc_users WHERE role != 'admin'`;
     res.json({ success: true });
   } catch (error) {
@@ -238,7 +244,7 @@ app.post('/api/db/wipe', async (req, res) => {
   }
 });
 
-app.get('/api/db/questions-count', async (req, res) => {
+apiRouter.get('/db/questions-count', async (req, res) => {
   try {
     const count = await sql`SELECT COUNT(*) as total FROM itc_assessment_results`;
     res.json({ total: parseInt(count[0].total) });
@@ -247,7 +253,7 @@ app.get('/api/db/questions-count', async (req, res) => {
   }
 });
 
-app.post('/api/db/update-password', async (req, res) => {
+apiRouter.post('/db/update-password', async (req, res) => {
   const { userId, currentPass, newPass } = req.body;
   try {
     const user = await sql`SELECT password FROM itc_users WHERE id = ${userId} LIMIT 1`;
@@ -261,7 +267,7 @@ app.post('/api/db/update-password', async (req, res) => {
   }
 });
 
-app.post('/api/db/update-recovery', async (req, res) => {
+apiRouter.post('/db/update-recovery', async (req, res) => {
   const { userId, currentPass, newRecoveryCode } = req.body;
   try {
     const user = await sql`SELECT password FROM itc_users WHERE id = ${userId} LIMIT 1`;
@@ -275,7 +281,7 @@ app.post('/api/db/update-recovery', async (req, res) => {
   }
 });
 
-app.post('/api/db/reset-password', async (req, res) => {
+apiRouter.post('/db/reset-password', async (req, res) => {
   const { pNo, recoveryCode, newKey } = req.body;
   try {
     const user = await sql`SELECT id, recovery_code FROM itc_users WHERE employee_id_pno = ${pNo} LIMIT 1`;
@@ -286,6 +292,23 @@ app.post('/api/db/reset-password', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: 'SYSTEM_ERROR' });
   }
+});
+
+// Main app middleware for Netlify pathing
+app.use((req, res, next) => {
+  if (req.url.startsWith('/.netlify/functions/server')) {
+    req.url = req.url.replace('/.netlify/functions/server', '');
+  }
+  next();
+});
+
+// Mount router
+app.use('/api', apiRouter);
+app.use(apiRouter); // Fallback for stripped /api
+
+// Simple health check for the root
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 export { app };
