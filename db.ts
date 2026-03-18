@@ -2,16 +2,17 @@
 import { ScoringResult } from './types';
 
 async function apiRequest(path: string, method: string = 'GET', body?: any) {
-  console.log(`apiRequest: ${method} ${path}`);
+  const fullUrl = `${window.location.origin}${path}`;
+  console.log(`apiRequest: ${method} ${fullUrl}`);
   const response = await fetch(path, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });
-  console.log(`apiResponse: ${response.status} ${path}`);
+  console.log(`apiResponse: ${response.status} ${fullUrl}`);
   if (!response.ok) {
     const contentType = response.headers.get('content-type');
-    let errorMessage = `API Error: ${response.status}`;
+    let errorMessage = `API Error: ${response.status} at ${path}`;
     
     if (contentType && contentType.includes('application/json')) {
       const errorData = await response.json().catch(() => ({}));
@@ -60,9 +61,9 @@ export async function registerUser(user: any) {
   }
 }
 
-export async function loginUser(pNo: string, securityKey: string) {
+export async function loginUser(employee_id_pno: string, securityKey: string) {
   try {
-    return await apiRequest('/api/db/login', 'POST', { pNo, securityKey });
+    return await apiRequest('/api/db/login', 'POST', { employee_id_pno, securityKey });
   } catch (error) {
     return { success: false, error: (error as any).message };
   }

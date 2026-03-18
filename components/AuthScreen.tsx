@@ -59,6 +59,13 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
           hint: 'An internal security exception occurred while processing your request. Please restart the terminal application.'
         };
       default:
+        // If the code itself is a long message (like our 404 message), use it
+        if (code.includes('404') || code.includes('API Endpoint')) {
+          return {
+            message: 'Registry Server Error',
+            hint: 'The authentication endpoint could not be reached. If you are on Netlify, please ensure your environment variables (DATABASE_URL) are set and the serverless function is deployed.'
+          };
+        }
         return {
           message: `Access Denied (${code})`,
           hint: inputPNo ? `An unexpected authentication error occurred for P.NO "${inputPNo}". Please verify your credentials and attempt to enter the terminal again.` : 'An unexpected authentication error occurred. Please verify your credentials and attempt to enter the terminal again.'
@@ -98,6 +105,16 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
       setError({ code: 'CONNECTION_FAILED', ...details });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const troubleshootApi = async () => {
+    try {
+      const res = await fetch('/api/direct-test');
+      const data = await res.json();
+      alert(`API Troubleshoot: ${JSON.stringify(data)}`);
+    } catch (err) {
+      alert(`API Troubleshoot Failed: ${err}`);
     }
   };
 
@@ -254,6 +271,14 @@ const AuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
               <span>{error.message}</span>
             </div>
             {error.hint && <p className="text-[9px] font-medium opacity-70 pl-8 leading-tight lowercase first-letter:uppercase italic">{error.hint}</p>}
+            {error.code.includes('404') && (
+              <button 
+                onClick={troubleshootApi}
+                className="mt-2 text-[8px] font-bold text-blue-600 dark:text-blue-400 underline text-left pl-8"
+              >
+                Run API Troubleshoot
+              </button>
+            )}
           </div>
         )}
 
